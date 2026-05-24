@@ -196,6 +196,10 @@ function createReportPlaceholder(label: string) {
 
 const PRODUCT_FLOW_STAGE_WIDTH = 1532
 const PRODUCT_FLOW_STAGE_HEIGHT = 860
+const PRODUCT_RESULT_CARD_WIDTH = 1600
+const PRODUCT_RESULT_CARD_HEIGHT = 860
+const PRODUCT_RESULT_CARD_MAX_WIDTH = `min(100cqw, calc(100cqh * ${PRODUCT_RESULT_CARD_WIDTH} / ${PRODUCT_RESULT_CARD_HEIGHT}))`
+
 function useStageScale(baseWidth: number, baseHeight: number) {
   const { containerRef, height, scale, width } = useElementFitScale({ baseHeight, baseWidth })
 
@@ -359,14 +363,12 @@ function StepFiveRoseChart({
   compact = false,
   style,
   theme,
-  selectedCardId,
 }: {
   className?: string
   compact?: boolean
   labelScale: number
   style?: CSSProperties
   theme: ReturnType<typeof getProductResultTheme>
-  selectedCardId?: string
 }) {
   const chartRef = useRef<HTMLDivElement>(null)
 
@@ -3151,15 +3153,18 @@ function ProductSelectionStepFive({
   const contentFadeDelay = revealFromStepFour ? 0.36 : 0
 
   return (
-    <div className="flex min-h-0 flex-1 px-[144px] py-5">
+    <div className="flex min-h-0 flex-1 items-center justify-center px-[144px] py-5" style={{ containerType: 'size' }}>
       <motion.div
         ref={resultCardRef}
         animate={{ scale: 1 }}
-        className="relative min-h-0 flex-1 overflow-hidden rounded-[20px] shadow-[0_16px_36px_rgba(15,23,42,0.08)] outline outline-[10px] outline-offset-0"
+        className="relative min-h-0 flex-none overflow-hidden rounded-[20px] shadow-[0_16px_36px_rgba(15,23,42,0.08)] outline outline-[10px] outline-offset-0"
         initial={revealFromStepFour ? { scale: 0.985 } : { scale: 1 }}
         style={{
+          aspectRatio: `${PRODUCT_RESULT_CARD_WIDTH} / ${PRODUCT_RESULT_CARD_HEIGHT}`,
           backgroundColor: '#FFFFFF',
+          maxHeight: '100%',
           outlineColor: `${productResultTheme.resultText}26`,
+          width: PRODUCT_RESULT_CARD_MAX_WIDTH,
         }}
         transition={{ delay: shellFadeDelay, duration: 0.56, ease: 'easeOut' }}
       >
@@ -3265,7 +3270,6 @@ function ProductSelectionStepFive({
                   labelScale={drilldownContentScale}
                   style={{ width: drilldownChartSize.roseWidth, height: drilldownChartSize.roseHeight }}
                   theme={productResultTheme}
-                  selectedCardId={selectedCard.id}
                 />
               )}
 
@@ -3726,8 +3730,8 @@ function ProductSelectionStepSix({
   const [reportCardSize, setReportCardSize] = useState({ width: 1600, height: 860 })
   const reportConfig = stepSixReportConfigs[selectedCard.id] ?? stepSixReportConfigs.backpack
   const productResultTheme = getProductResultTheme(selectedCard.id)
-  const reportDesignWidth = 1600
-  const reportDesignHeight = 860
+  const reportDesignWidth = PRODUCT_RESULT_CARD_WIDTH
+  const reportDesignHeight = PRODUCT_RESULT_CARD_HEIGHT
   const squaresConvergeDuration = STEP_SIX_SQUARES_CONVERGE_DURATION
   const progressStartDelay = STEP_SIX_PROGRESS_START_DELAY
   const reportRevealDelay = STEP_SIX_REPORT_REVEAL_DELAY
@@ -3793,16 +3797,19 @@ function ProductSelectionStepSix({
   }, [])
 
   return (
-    <div className="relative flex min-h-0 flex-1 px-[144px] py-5">
+    <div className="relative flex min-h-0 flex-1 items-center justify-center px-[144px] py-5" style={{ containerType: 'size' }}>
       <motion.div
         ref={reportCardRef}
         animate={{ opacity: 1, y: 0 }}
-        className="relative min-h-0 flex-1 overflow-hidden rounded-[20px] shadow-[0_16px_36px_rgba(15,23,42,0.08)] outline outline-[10px] outline-offset-0"
+        className="relative min-h-0 flex-none overflow-hidden rounded-[20px] shadow-[0_16px_36px_rgba(15,23,42,0.08)] outline outline-[10px] outline-offset-0"
         initial={{ opacity: 0, y: 18 }}
         transition={{ delay: reportRevealDelay, duration: 0.42, ease: 'easeOut' }}
         style={{
+          aspectRatio: `${PRODUCT_RESULT_CARD_WIDTH} / ${PRODUCT_RESULT_CARD_HEIGHT}`,
           backgroundColor: productResultTheme.containerBackground,
+          maxHeight: '100%',
           outlineColor: `${productResultTheme.resultText}26`,
+          width: PRODUCT_RESULT_CARD_MAX_WIDTH,
         }}
       >
         <AnimatePresence custom={reportPageDirection} initial={false} mode="sync">
@@ -4401,7 +4408,7 @@ function ProductSelectionStepSeven({
       <PageTransition disableOpacity>
         <ScreenShell contentClassName="px-0 py-0">
           <ProductSurfaceBackground backgroundColor={getProductFlowNeutralBackground()} selectedCardId={selectedCard.id} step={activeStep.step} />
-          <section className="relative z-20 flex min-h-screen w-full flex-col supports-[height:100dvh]:min-h-dvh">
+          <section className="relative z-20 flex h-screen w-full flex-col supports-[height:100dvh]:h-dvh">
             <header className="flex h-20 shrink-0 items-center justify-between px-10">
               <Link className="flex h-9 items-center" to="/">
                 <img
@@ -4452,7 +4459,7 @@ function ProductSelectionStepSeven({
       <PageTransition disableOpacity>
         <ScreenShell contentClassName="px-0 py-0">
           <ProductSurfaceBackground backgroundColor={getProductFlowNeutralBackground()} selectedCardId={selectedCard.id} step={activeStep.step} />
-          <section className="relative z-20 flex min-h-screen w-full flex-col supports-[height:100dvh]:min-h-dvh">
+          <section className="relative z-20 flex h-screen w-full flex-col supports-[height:100dvh]:h-dvh">
             <header className="flex h-20 shrink-0 items-center justify-between px-10">
               <Link className="flex h-9 items-center" to="/">
                 <img

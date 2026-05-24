@@ -33,8 +33,6 @@ import {
   Plus,
   RefreshCcw,
   ShieldCheck,
-  TrendingDown,
-  TrendingUp,
   Truck,
   Waves,
   Zap,
@@ -56,8 +54,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -235,32 +231,47 @@ function getDashboardCardTitle(widget: PlacedWidget) {
 
 function getCardTitleClassName(size: WidgetSize, previewMode: boolean) {
   if (previewMode) {
-    if (size === 'large') return 'text-[clamp(24px,1.55vw,34px)]'
-    if (size === 'medium') return 'text-[clamp(21px,1.25vw,28px)]'
-    return 'text-[clamp(18px,1vw,24px)]'
+    if (size === 'large') return 'text-[clamp(22px,1.35vw,30px)]'
+    if (size === 'medium') return 'text-[clamp(18px,1.05vw,24px)]'
+    return 'text-[clamp(16px,0.88vw,20px)]'
   }
 
-  return size === 'large' ? 'text-[22px]' : 'text-[18px]'
-}
-
-function getCardDescriptionClassName(size: WidgetSize, previewMode: boolean) {
-  if (previewMode) {
-    if (size === 'large') return 'text-[clamp(14px,0.82vw,18px)]'
-    if (size === 'medium') return 'text-[clamp(13px,0.72vw,16px)]'
-    return 'text-[clamp(12px,0.62vw,15px)]'
-  }
-
-  return size === 'large' ? 'text-sm' : 'text-xs'
+  if (size === 'large') return 'text-[20px]'
+  if (size === 'medium') return 'text-[17px]'
+  return 'text-[16px]'
 }
 
 function getCardIconClassName(size: WidgetSize, previewMode: boolean) {
   if (previewMode) {
-    if (size === 'large') return 'size-[clamp(22px,1.35vw,30px)]'
-    if (size === 'medium') return 'size-[clamp(19px,1.1vw,26px)]'
-    return 'size-[clamp(17px,0.95vw,22px)]'
+    if (size === 'large') return 'size-[clamp(20px,1.2vw,26px)]'
+    if (size === 'medium') return 'size-[clamp(17px,0.95vw,22px)]'
+    return 'size-[clamp(15px,0.78vw,18px)]'
   }
 
   return size === 'large' ? 'size-5' : 'size-4'
+}
+
+function getCardHeaderClassName(size: WidgetSize, previewMode: boolean) {
+  if (previewMode) {
+    if (size === 'large') return 'px-5 pt-4 pb-2 pr-12'
+    return 'px-4 pt-3 pb-1.5 pr-11'
+  }
+
+  if (size === 'large') return 'px-5 pt-4 pb-2 pr-12'
+  if (size === 'medium') return 'px-4 pt-3 pb-1.5 pr-11'
+  return 'px-3.5 pt-3 pb-1 pr-10'
+}
+
+function getCardIconWrapClassName(size: WidgetSize, previewMode: boolean) {
+  if (previewMode) {
+    if (size === 'large') return 'size-10 rounded-[10px]'
+    if (size === 'medium') return 'size-9 rounded-[9px]'
+    return 'size-8 rounded-[8px]'
+  }
+
+  if (size === 'large') return 'size-10 rounded-[10px]'
+  if (size === 'medium') return 'size-9 rounded-[9px]'
+  return 'size-8 rounded-[8px]'
 }
 
 
@@ -314,19 +325,21 @@ const rosePieDataMap: Record<string, { name: string; value: number; fill: string
 
 function ShadcnRosePie({ moduleId, size }: { moduleId: string; size: WidgetSize }) {
   const data = rosePieDataMap[moduleId] || rosePieDataMap['total-emission']
+  const innerRadius = size === 'small' ? 28 : size === 'medium' ? 34 : 42
+  const outerRadius = size === 'small' ? 52 : size === 'medium' ? 66 : 82
   const chartConfig = {
     value: { label: '碳排放量 (tCO2e)' },
   }
   return (
-    <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[132px]">
+    <ChartContainer config={chartConfig} className="mx-auto h-full max-h-full aspect-square">
       <RechartsPieChart>
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <Pie
           data={data}
           dataKey="value"
           nameKey="name"
-          innerRadius={size === 'small' ? 24 : 32}
-          outerRadius={size === 'small' ? 44 : 58}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius}
           paddingAngle={3}
         >
           {data.map((entry, index) => (
@@ -363,22 +376,23 @@ const trendAreaDataMap: Record<string, { name: string; value: number }[]> = {
   ]
 }
 
-function ShadcnTrendArea({ moduleId, size: _size }: { moduleId: string; size: WidgetSize }) {
+function ShadcnTrendArea({ moduleId, size }: { moduleId: string; size: WidgetSize }) {
   const data = trendAreaDataMap[moduleId] || trendAreaDataMap['monthly-trend']
+  const isCompact = size === 'small'
   const chartConfig = {
     value: { label: '数值', color: '#1677FF' },
   }
   return (
-    <ChartContainer config={chartConfig} className="w-full h-full max-h-[132px]">
-      <AreaChart data={data} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
+    <ChartContainer config={chartConfig} className="h-full min-h-0 w-full">
+      <AreaChart data={data} margin={isCompact ? { left: 0, right: 8, top: 8, bottom: 0 } : { left: -8, right: 10, top: 10, bottom: 0 }}>
         <defs>
           <linearGradient id={`colorValue-${moduleId}`} x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#1677FF" stopOpacity={0.4}/>
             <stop offset="95%" stopColor="#1677FF" stopOpacity={0.01}/>
           </linearGradient>
         </defs>
-        <XAxis dataKey="name" tickLine={false} axisLine={false} style={{ fontSize: 10, fill: '#64748b' }} />
-        <YAxis tickLine={false} axisLine={false} style={{ fontSize: 10, fill: '#64748b' }} />
+        <XAxis dataKey="name" tickLine={false} axisLine={false} style={{ fontSize: isCompact ? 9 : 10, fill: '#64748b' }} />
+        {isCompact ? null : <YAxis tickLine={false} axisLine={false} style={{ fontSize: 10, fill: '#64748b' }} />}
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <Area type="monotone" dataKey="value" stroke="#1677FF" strokeWidth={2} fill={`url(#colorValue-${moduleId})`} />
       </AreaChart>
@@ -411,16 +425,17 @@ const barRankDataMap: Record<string, { name: string; value: number }[]> = {
   ]
 }
 
-function ShadcnBarRank({ moduleId, size: _size }: { moduleId: string; size: WidgetSize }) {
+function ShadcnBarRank({ moduleId, size }: { moduleId: string; size: WidgetSize }) {
   const data = barRankDataMap[moduleId] || barRankDataMap['product-footprint-top']
+  const isCompact = size === 'small'
   const chartConfig = {
     value: { label: '指标数值', color: '#1677FF' },
   }
   return (
-    <ChartContainer config={chartConfig} className="w-full h-full max-h-[132px]">
-      <RechartsBarChart data={data} margin={{ left: -10, right: 10, top: 10, bottom: 0 }}>
-        <XAxis dataKey="name" tickLine={false} axisLine={false} style={{ fontSize: 10, fill: '#64748b' }} />
-        <YAxis tickLine={false} axisLine={false} style={{ fontSize: 10, fill: '#64748b' }} />
+    <ChartContainer config={chartConfig} className="h-full min-h-0 w-full">
+      <RechartsBarChart data={data} margin={isCompact ? { left: 0, right: 8, top: 8, bottom: 0 } : { left: -8, right: 10, top: 10, bottom: 0 }}>
+        <XAxis dataKey="name" tickLine={false} axisLine={false} style={{ fontSize: isCompact ? 9 : 10, fill: '#64748b' }} />
+        {isCompact ? null : <YAxis tickLine={false} axisLine={false} style={{ fontSize: 10, fill: '#64748b' }} />}
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <Bar dataKey="value" fill="#1677FF" radius={[4, 4, 0, 0]} />
       </RechartsBarChart>
@@ -458,16 +473,17 @@ const riskRadarDataMap: Record<string, { subject: string; value: number }[]> = {
   ]
 }
 
-function ShadcnRiskRadar({ moduleId, size: _size }: { moduleId: string; size: WidgetSize }) {
+function ShadcnRiskRadar({ moduleId, size }: { moduleId: string; size: WidgetSize }) {
   const data = riskRadarDataMap[moduleId] || riskRadarDataMap['risk-alert']
+  const angleFontSize = size === 'small' ? 8 : 9
   const chartConfig = {
     value: { label: '评分值', color: '#1677FF' },
   }
   return (
-    <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[132px]">
+    <ChartContainer config={chartConfig} className="mx-auto h-full max-h-full aspect-square">
       <RechartsRadarChart data={data}>
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-        <PolarAngleAxis dataKey="subject" style={{ fontSize: 9, fill: '#64748b' }} />
+        <PolarAngleAxis dataKey="subject" style={{ fontSize: angleFontSize, fill: '#64748b' }} />
         <PolarGrid gridType="circle" />
         <Radar dataKey="value" stroke="#1677FF" fill="#1677FF" fillOpacity={0.25} />
       </RechartsRadarChart>
@@ -475,7 +491,7 @@ function ShadcnRiskRadar({ moduleId, size: _size }: { moduleId: string; size: Wi
   )
 }
 
-function ShadcnCoreRing({ moduleId: _moduleId, size }: { moduleId: string; size: WidgetSize }) {
+function ShadcnCoreRing({ size }: { moduleId: string; size: WidgetSize }) {
   const data = [
     { name: '自发绿电', value: 45, fill: '#1677FF' },
     { name: '外购火电', value: 35, fill: '#22D3EE' },
@@ -484,16 +500,18 @@ function ShadcnCoreRing({ moduleId: _moduleId, size }: { moduleId: string; size:
   const chartConfig = {
     value: { label: '占比 (%)' },
   }
+  const innerRadius = size === 'small' ? 28 : size === 'medium' ? 34 : 42
+  const outerRadius = size === 'small' ? 52 : size === 'medium' ? 66 : 82
   return (
-    <ChartContainer config={chartConfig} className="mx-auto aspect-square max-h-[132px]">
+    <ChartContainer config={chartConfig} className="mx-auto h-full max-h-full aspect-square">
       <RechartsPieChart>
         <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
         <Pie
           data={data}
           dataKey="value"
           nameKey="name"
-          innerRadius={size === 'small' ? 24 : 32}
-          outerRadius={size === 'small' ? 44 : 58}
+          innerRadius={innerRadius}
+          outerRadius={outerRadius}
           paddingAngle={4}
         >
           {data.map((entry, index) => (
@@ -505,9 +523,11 @@ function ShadcnCoreRing({ moduleId: _moduleId, size }: { moduleId: string; size:
   )
 }
 
-function ShadcnLossPath({ moduleId: _moduleId, size: _size }: { moduleId: string; size: WidgetSize }) {
+function ShadcnLossPath({ size }: { moduleId: string; size: WidgetSize }) {
+  const contentPadding = size === 'small' ? 'p-1' : 'p-2'
+
   return (
-    <div className="flex h-full w-full flex-col justify-center items-center p-2">
+    <div className={cn('flex h-full w-full flex-col justify-center items-center', contentPadding)}>
       <div className="flex justify-between items-center w-full max-w-[240px] relative">
         <div className="flex flex-col items-center z-10">
           <span className="size-8 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-600 text-[10px] flex items-center justify-center font-semibold bg-white shadow-sm">输入</span>
@@ -614,164 +634,6 @@ function getProcessNodeIcons(moduleId: string): LucideIcon[] {
 
   return [Database, Waves, Gauge, ShieldCheck, CheckCircle2]
 }
-
-function getWidgetFooterContent(widget: PlacedWidget) {
-  if (widget.id === 'total-emission') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>较去年同比整体下降 4.2%</span>
-        <TrendingDown className="h-3.5 w-3.5 text-emerald-500 animate-pulse" />
-      </div>
-    )
-  }
-  if (widget.id === 'monthly-trend') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>引入绿电后排碳率平稳走低</span>
-        <TrendingDown className="h-3.5 w-3.5 text-emerald-500" />
-      </div>
-    )
-  }
-  if (widget.id === 'emission-source') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>主要来源：范围二（购入电力）占比 58%</span>
-      </div>
-    )
-  }
-  if (widget.id === 'product-footprint-top') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>重点改善：背包制造阶段排碳（贡献率达 62%）</span>
-      </div>
-    )
-  }
-  if (widget.id === 'lifecycle-segment-emission') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>原材料阶段碳足迹占比最低（仅 8.6%）</span>
-      </div>
-    )
-  }
-  if (widget.id === 'total-energy') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>数据覆盖率已达到 98.6%，核算质量 优 🛡️</span>
-      </div>
-    )
-  }
-  if (widget.id === 'energy-overview') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>绿电及天然气等清洁能源使用比例提高</span>
-        <TrendingUp className="h-3.5 w-3.5 text-[#1677FF] animate-bounce" />
-      </div>
-    )
-  }
-  if (widget.id === 'energy-structure') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>低碳能源转型已达 45%（年度目标 50%）</span>
-        <TrendingUp className="h-3.5 w-3.5 text-[#1677FF]" />
-      </div>
-    )
-  }
-  if (widget.id === 'green-power') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>综合电力清洁化评分：优秀等级</span>
-      </div>
-    )
-  }
-  if (widget.id === 'energy-loss') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>变压线路等间接能耗损耗率降低 3.1%</span>
-        <TrendingDown className="h-3.5 w-3.5 text-emerald-500" />
-      </div>
-    )
-  }
-  if (widget.id === 'risk-alert') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>系统评估整体配额风险处于低风险状态</span>
-      </div>
-    )
-  }
-  if (widget.id === 'abnormal-energy-alert') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>未检测到异常耗能路径与政策偏离</span>
-      </div>
-    )
-  }
-  if (widget.id === 'over-budget-alert') {
-    return (
-      <div className="flex items-center gap-1.5 text-rose-600 font-semibold text-[11px]">
-        <span>警告：A生产线能耗超出本月预算 18%</span>
-        <TrendingUp className="h-3.5 w-3.5 text-rose-500 animate-pulse" />
-      </div>
-    )
-  }
-  if (widget.id === 'quota-gap') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>碳资产余量平稳，预计履约盈余 1.2 万吨</span>
-      </div>
-    )
-  }
-  if (widget.id === 'compliance-days-left') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>清缴报告提交就绪度：95%，履约健康</span>
-      </div>
-    )
-  }
-  if (widget.id === 'accounting-progress') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>第三方核查进度已推进 85%（预计3日内完成）</span>
-      </div>
-    )
-  }
-  if (widget.id === 'inventory-report-status') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>《盘查报告V2》已流转至复核岗审核</span>
-      </div>
-    )
-  }
-  if (widget.id === 'supplier-data-recovery') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>主要供应商填报回收率本周突破 89%</span>
-        <TrendingUp className="h-3.5 w-3.5 text-[#1677FF]" />
-      </div>
-    )
-  }
-  if (widget.id === 'verification-material') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>核查凭证及资料上传完备度达 100% 🎖️</span>
-      </div>
-    )
-  }
-  if (widget.id === 'pending-vouchers') {
-    return (
-      <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-        <span>待补凭证已从上周的 24 张缩减至 4 张</span>
-        <TrendingDown className="h-3.5 w-3.5 text-emerald-500" />
-      </div>
-    )
-  }
-  
-  return (
-    <div className="flex items-center gap-1.5 text-slate-500 font-semibold text-[11px]">
-      <span>较上期保持稳定发展态势</span>
-    </div>
-  )
-}
-
 
 export function CompanyCarbonDashboardPage() {
   const previewRef = useRef<HTMLDivElement>(null)
@@ -976,10 +838,10 @@ export function CompanyCarbonDashboardPage() {
               !previewMode ? 'active:cursor-grabbing' : 'cursor-default',
             )}
           >
-            <CardHeader className="relative pr-12 pb-2">
-              <div className="flex items-center gap-2">
+            <CardHeader className={cn('relative shrink-0', getCardHeaderClassName(slot.size, previewMode))}>
+              <div className="flex min-w-0 items-center gap-2">
                 {CardIcon ? (
-                  <span className="inline-flex shrink-0 items-center justify-center rounded-[8px] bg-blue-50 text-[#1677FF] p-1.5">
+                  <span className={cn('inline-flex shrink-0 items-center justify-center bg-blue-50 text-[#1677FF]', getCardIconWrapClassName(slot.size, previewMode))}>
                     <CardIcon className={getCardIconClassName(slot.size, previewMode)} strokeWidth={1.8} />
                   </span>
                 ) : null}
@@ -987,12 +849,12 @@ export function CompanyCarbonDashboardPage() {
                   {cardTitle}
                 </CardTitle>
               </div>
-              <CardDescription className={cn('truncate text-slate-500 mt-1', getCardDescriptionClassName(slot.size, previewMode))}>
-                {widget.description}
-              </CardDescription>
               {!previewMode ? (
                 <button
-                  className="absolute right-4 top-4 z-30 flex size-8 items-center justify-center rounded-[0.5em] bg-slate-100 text-slate-400 transition hover:bg-blue-50 hover:text-[#1677FF] cursor-pointer"
+                  className={cn(
+                    'absolute z-30 flex items-center justify-center rounded-[0.5em] bg-slate-100 text-slate-400 transition hover:bg-blue-50 hover:text-[#1677FF] cursor-pointer',
+                    slot.size === 'large' ? 'right-4 top-4 size-8' : 'right-3 top-3 size-7',
+                  )}
                   onClick={(event) => {
                     event.preventDefault()
                     event.stopPropagation()
@@ -1001,20 +863,16 @@ export function CompanyCarbonDashboardPage() {
                   title="移除组件"
                   type="button"
                 >
-                  <Trash2 className="size-4" />
+                  <Trash2 className={slot.size === 'large' ? 'size-4' : 'size-3.5'} />
                 </button>
               ) : null}
             </CardHeader>
 
-            <CardContent className="flex-1 min-h-0 flex items-center justify-center py-2 px-4">
-              <div className="w-full h-full min-h-[120px] flex items-center justify-center">
+            <CardContent className="flex flex-1 items-center justify-center min-h-0 px-3 pb-3 pt-1 sm:px-4">
+              <div className="flex h-full min-h-0 w-full items-center justify-center">
                 <ChartThumbnail kind={getChartVisualKind(widget)} size={slot.size} moduleId={widget.id} />
               </div>
             </CardContent>
-
-            <CardFooter className="pt-2 pb-3 text-xs flex justify-between border-t border-slate-100 bg-slate-50/50 px-4 rounded-b-xl">
-              {getWidgetFooterContent(widget)}
-            </CardFooter>
           </Card>
         ) : (
           <div className="relative z-10 flex h-full flex-col items-center justify-center p-[16.2px] text-center text-slate-500">
