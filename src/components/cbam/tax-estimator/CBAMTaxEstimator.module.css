@@ -1,0 +1,687 @@
+/* Main container */
+.root {
+  /* background: linear-gradient(to bottom right, #eff6ff, #e0e7ff); */
+  max-width: 1382px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+}
+
+.headerContent {
+  margin: 0 auto;
+  padding: 24px 0;
+}
+
+.headerTitle {
+  font-size: 30px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.headerDesc {
+  color: #4b5563;
+  text-align: center;
+}
+
+/* Main content */
+.mainContent {
+  margin: 0 auto;
+  padding: 32px 0;
+}
+
+/* Search Card */
+.searchCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.cardTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.cardDesc {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.searchInputRoot {
+  width: 100%;
+}
+
+.searchInput {
+  width: 100%;
+  height: 44px;
+  min-height: 44px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background-color: #fff;
+  color: #111827;
+  font-size: 14px;
+  line-height: 1.4;
+  padding-left: 42px;
+  padding-right: 42px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.searchInput::placeholder {
+  color: #9ca3af;
+  opacity: 1;
+}
+
+.searchInput:focus,
+.searchInput:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14);
+}
+
+.searchInputSection {
+  width: 42px;
+  color: #6b7280;
+}
+
+.searchDropdown {
+  box-sizing: border-box;
+  padding-left: 20px;
+  padding-right: 20px;
+  overflow-x: hidden;
+}
+
+/* Autocomplete styles */
+.autocompleteOption {
+  padding: 8px 0;
+  width: 100%;
+  min-width: 0;
+  gap: 16px;
+  overflow-x: hidden;
+}
+
+.selectOption {
+  &[data-combobox-selected='true'] {
+    background-color: #eff6ff;
+  }
+}
+
+.suggestionCode {
+  font-family: monospace;
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.suggestionDetails {
+  font-size: 14px;
+  color: #4b5563;
+  margin-top: 4px;
+  min-width: 0;
+}
+
+.suggestionProductName {
+  font-weight: 500;
+  color: #1f2937;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.suggestionMeta {
+  font-size: 12px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+/* Custom price section */
+.customPriceSection {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.customPriceCheckboxRoot {
+  --checkbox-size: 16px;
+}
+
+.customPriceCheckboxBody {
+  align-items: center;
+}
+
+.customPriceCheckboxInput {
+  border-color: #2563eb;
+}
+
+.customPriceCheckboxInput:checked {
+  border-color: #2563eb;
+  background-color: #2563eb;
+}
+
+.customPriceCheckboxIcon {
+  inset: 0;
+  width: 62%;
+  height: 62%;
+  margin: auto;
+}
+
+.actualValueSection {
+  background-color: #eff6ff;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+}
+
+.checkboxLabel {
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+}
+
+.priceInputRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.priceInputLabel {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.priceInput {
+  width: 96px;
+}
+
+.priceInputControl {
+  height: 32px;
+  min-height: 32px;
+  border: 1px solid #94a3b8;
+  border-radius: 6px;
+  background-color: #fff;
+  color: #111827;
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: none;
+  padding-left: 12px;
+}
+
+.priceInputControl::placeholder {
+  color: #6b7280;
+  opacity: 1;
+}
+
+.priceInputControl:focus,
+.priceInputControl:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+}
+
+.priceInputHint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-left: 8px;
+}
+
+.actualValueHint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 8px;
+}
+
+/* Alert */
+.notFoundAlert {
+  margin-bottom: 32px;
+}
+
+/* Results section */
+.resultsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Result Card */
+.resultCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 24px;
+}
+
+.resultCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.resultCardTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 20px;
+}
+
+.resultCardTitleText {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+}
+
+.resultCardAction {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  color: #2563eb;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.resultGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.resultItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.resultLabel {
+  font-weight: 600;
+  color: #111827;
+}
+
+.resultValue {
+  font-size: 24px;
+  font-family: monospace;
+  font-weight: 700;
+}
+
+.resultValueBlue {
+  color: #2563eb;
+}
+
+.resultValueGreen {
+  color: #16a34a;
+}
+
+.resultValueLarge {
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.resultHint {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+  line-height: 1.5;
+}
+
+/* Calculation note */
+.calculationNote {
+  background-color: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.noteContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.noteIcon {
+  color: #d97706;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.noteText {
+  font-size: 14px;
+  color: #92400e;
+  line-height: 1.6;
+}
+
+.noteTextBold {
+  font-weight: 500;
+}
+
+/* Tax comparison */
+.taxComparisonGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.taxComparisonCard {
+  padding: 16px;
+  border-radius: 8px;
+  border-width: 2px;
+  border-style: solid;
+}
+
+.taxComparisonCardRecommended {
+  background-color: #f0fdf4;
+  border-color: #86efac;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.taxComparisonCardDefault {
+  background-color: #f9fafb;
+  border-color: #e5e7eb;
+}
+
+.taxComparisonCardActive {
+  background-color: #eff6ff;
+  border-color: #93c5fd;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.taxComparisonCardHigher {
+  background-color: #fef2f2;
+  border-color: #fecaca;
+}
+
+.taxComparisonHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.taxComparisonTitle {
+  font-weight: 600;
+  color: #111827;
+}
+
+.recommendedTag {
+  font-size: 12px;
+  background-color: #dcfce7;
+  color: #15803d;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.activeTag {
+  font-size: 12px;
+  background-color: #dbeafe;
+  color: #1d4ed8;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.taxAmountGreen {
+  font-size: 24px;
+  font-weight: 700;
+  color: #16a34a;
+}
+
+.taxAmountBlue {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.taxAmountGray {
+  font-size: 24px;
+  font-weight: 700;
+  color: #4b5563;
+}
+
+.taxAmountRed {
+  font-size: 24px;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.taxEmissionInfo {
+  font-size: 14px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+/* Calculation formula */
+.calculationFormula {
+  margin-top: 12px;
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+}
+
+.formulaLabel {
+  font-size: 12px;
+  color: #4b5563;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.formulaText {
+  font-size: 12px;
+  color: #374151;
+  font-family: monospace;
+  line-height: 1.5;
+  margin-bottom: 2px;
+}
+
+/* Single tax result calculation formula */
+.singleCalculationFormula {
+  margin-top: 16px;
+  padding: 12px;
+  background-color: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.singleFormulaLabel {
+  font-size: 14px;
+  color: #374151;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.singleFormulaText {
+  font-size: 14px;
+  color: #374151;
+  font-family: monospace;
+  line-height: 1.5;
+  margin-bottom: 4px;
+}
+
+.singleFormulaTextBold {
+  font-size: 14px;
+  color: #374151;
+  font-family: monospace;
+  line-height: 1.5;
+  font-weight: 600;
+}
+
+/* Warning box */
+.warningBox {
+  background-color: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.warningContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.warningIcon {
+  color: #ea580c;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.warningText {
+  font-size: 14px;
+  color: #9a3412;
+  font-weight: 500;
+}
+
+.warningDiff {
+  font-size: 12px;
+  color: #ea580c;
+  margin-top: 4px;
+}
+
+.carbonPriceNote {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* Single tax result */
+.singleTaxResult {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.singleTaxAmount {
+  font-size: 30px;
+  font-weight: 700;
+  color: #dc2626;
+}
+
+.singleTaxNote {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.customPriceUsed {
+  font-size: 12px;
+  color: #2563eb;
+}
+
+/* Details toggle */
+.detailsToggle {
+  display: flex;
+  justify-content: center;
+}
+
+/* Detailed info grid */
+.detailsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .resultGrid,
+  .detailsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 576px) {
+  .headerTitle {
+    font-size: 24px;
+  }
+
+  .searchCard {
+    padding: 16px;
+  }
+
+  .searchInput {
+    font-size: 13px;
+  }
+
+  .autocompleteOption {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .suggestionProductName {
+    white-space: normal;
+  }
+
+  .resultGrid,
+  .taxComparisonGrid,
+  .detailsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detailItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.detailLabel {
+  font-weight: 500;
+  color: #374151;
+}
+
+.detailValue {
+  font-size: 18px;
+  font-family: monospace;
+}
+
+.detailNote {
+  font-size: 12px;
+  color: #2563eb;
+}
+
+/* Categories section */
+.categoriesCard {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  padding: 24px;
+}
+
+.categoriesTitle {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.categoriesDesc {
+  font-size: 14px;
+  color: #6b7280;
+  margin-bottom: 16px;
+}
+
+.categoriesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
