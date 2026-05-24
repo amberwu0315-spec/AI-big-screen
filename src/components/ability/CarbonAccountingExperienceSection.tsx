@@ -54,7 +54,7 @@ function ExperienceEntryCard({
         <h3 className="text-[30px] font-semibold leading-tight text-white">{name}</h3>
         <p className="min-h-[76px] max-w-full break-words text-[18px] leading-[1.38] text-neutral-400">{description}</p>
         <RainbowButton asChild className="mt-[12px] h-auto w-fit self-start px-[18px] py-[10px] text-[16px]">
-          <Link to={href}>
+          <Link state={{ entryTransition: 'slide-up' }} to={href}>
             <span>{cta}</span>
             <ArrowDown className="ml-1 size-[1em]" />
           </Link>

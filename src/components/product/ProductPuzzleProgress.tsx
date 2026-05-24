@@ -46,7 +46,10 @@ export function ProductPuzzleProgress({
 }: ProductPuzzleProgressProps) {
   const [viewportSize, setViewportSize] = useState(getViewportSize)
   const isComplete = animateOnComplete && activeStepNumber >= 7
-  const highlightedPieceCount = Math.min(puzzlePieces.length, Math.max(0, activeStepNumber - 1))
+  const highlightedPieceCount = Math.min(
+    puzzlePieces.length,
+    Math.max(0, activeStepNumber >= 6 ? activeStepNumber : activeStepNumber - 1),
+  )
   const centerX = (viewportSize.width - puzzleSize) / 2
   const centerY = (viewportSize.height - puzzleSize) / 2
   const animationTarget = isComplete
@@ -118,7 +121,7 @@ export function ProductPuzzleProgress({
               }}
               style={{
                 backgroundColor: isHighlighted ? activeColor : undefined,
-                borderColor: isCurrent ? activeColor : undefined,
+                borderColor: isCurrent && !isHighlighted ? activeColor : undefined,
               }}
               transition={{ duration: 0.24, ease: 'easeOut' }}
             >
@@ -128,7 +131,7 @@ export function ProductPuzzleProgress({
                   isHighlighted ? "text-white" : 
                   !isCurrent ? "text-[#9AA8BF]" : undefined
                 )} 
-                style={isCurrent ? { color: activeColor } : undefined}
+                style={isCurrent && !isHighlighted ? { color: activeColor } : undefined}
               />
             </motion.div>
           )

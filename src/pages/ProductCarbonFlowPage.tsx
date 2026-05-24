@@ -20,6 +20,7 @@ import { NavControl } from '@/components/common/NavControl'
 import { PageTransition } from '@/components/common/PageTransition'
 import { useElementFitScale } from '@/components/common/ScaledStage'
 import { ScreenShell } from '@/components/common/ScreenShell'
+import { AbilityPageTurnControls } from '@/components/ability/AbilityPageTurnControls'
 import { Confetti, type ConfettiRef } from '@/components/magicui/Confetti'
 import { NeonBorder } from '@/components/magicui/NeonBorder'
 import { CardScanOverlay } from '@/components/product/CardScanOverlay'
@@ -118,33 +119,23 @@ const stepFivePageTurnTransition: Transition = {
 
 const stepFivePageTurnVariants = {
   initial: (direction: StepFivePageTurnDirection) => ({
-    opacity: 0.72,
+    opacity: 0,
     x: direction === 'forward' ? '100%' : '-100%',
-    rotateY: direction === 'forward' ? -7 : 7,
-    scale: 0.985,
-    filter: 'brightness(0.94)',
-    transformOrigin: direction === 'forward' ? '0% 50%' : '100% 50%',
     zIndex: 2,
   }),
   animate: {
     opacity: 1,
     x: '0%',
-    rotateY: 0,
-    scale: 1,
-    filter: 'brightness(1)',
-    transformOrigin: '50% 50%',
     zIndex: 2,
   },
   exit: (direction: StepFivePageTurnDirection) => ({
-    opacity: 0.58,
+    opacity: 0,
     x: direction === 'forward' ? '-100%' : '100%',
-    rotateY: direction === 'forward' ? 7 : -7,
-    scale: 0.985,
-    filter: 'brightness(0.9)',
-    transformOrigin: direction === 'forward' ? '100% 50%' : '0% 50%',
     zIndex: 1,
   }),
 }
+
+const stepSixReportPageOrder = ['report', 'preview-page-1', 'preview-page-2'] as const
 
 type CardAnnotation = {
   id: string
@@ -1707,10 +1698,7 @@ function ProductSelectorCarousel({
   }, [currentCard, onActiveCardChange])
 
   const handleSlotClick = (slot: number) => {
-    const card = getLoopedStepOneCard(activeIndex + slot)
-
     if (slot === 0) {
-      onSelect(card)
       return
     }
 
@@ -3140,7 +3128,7 @@ function ProductSelectionStepFive({
   const contentFadeDelay = revealFromStepFour ? 0.36 : 0
 
   return (
-    <div className="flex min-h-0 flex-1 px-[52px] py-5">
+    <div className="flex min-h-0 flex-1 px-[144px] py-5">
       <motion.div
         ref={resultCardRef}
         animate={{ scale: 1 }}
@@ -3245,7 +3233,7 @@ function ProductSelectionStepFive({
                     type="button"
                     onClick={onAdvance}
                   >
-                    <span>一键生成核算报告</span>
+                    <span>生成核算报告</span>
                     <MousePointerClick className="ml-[10px] h-[38px] w-[38px] shrink-0" strokeWidth={2.4} />
                   </button>
                 </div>
@@ -3490,7 +3478,7 @@ function ProductSelectionStepFive({
                 type="button"
                 onClick={onAdvance}
               >
-                <span>一键生成核算报告</span>
+                <span>生成核算报告</span>
                 <MousePointerClick className="ml-[10px] h-[38px] w-[38px] shrink-0" strokeWidth={2.4} />
               </button>
             </div>
@@ -3500,6 +3488,14 @@ function ProductSelectionStepFive({
           )}
           </AnimatePresence>
         </motion.div>
+        <AbilityPageTurnControls
+          activeSection={activeSection}
+          iconColor={productResultTheme.rightButtonBackground}
+          sectionOrder={sectionOrder}
+          showDisabledButtons
+          showDots={false}
+          onSectionSelect={onSectionSelect}
+        />
       </motion.div>
     </div>
   )
@@ -3568,7 +3564,7 @@ function ProductFlowThreeZoneLayout({
             />
           </Link>
 
-          <h1 className="text-right text-[24px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
+          <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
             {footerTitle ?? activeStepTitle}
           </h1>
         </header>
@@ -3620,27 +3616,16 @@ function ProductFlowFooter({
 
   return (
     <footer className="flex h-[93.36px] shrink-0 items-end justify-between px-10 pb-[30px]">
-      <div className="flex min-w-[320px] items-center gap-2">
-        <Button asChild className={commonGhostActionClassName} size="lg" variant="ghost">
-          <Link to="/ability/carbon-accounting/mechanism">
-            <LogOut />
-            <span>退出体验</span>
-          </Link>
-        </Button>
-        <FullscreenButton
-          className={commonGhostActionClassName}
-          display="text"
-          variant="ghost"
+      <div className="flex min-w-[320px] items-center justify-start">
+        <ProductPuzzleProgress
+          activeColor={activeColor}
+          activeStepNumber={activeStepNumber}
+          animateOnComplete={false}
+          placement="inline"
         />
       </div>
 
-      <ProductPuzzleProgress
-        activeColor={activeColor}
-        activeStepNumber={activeStepNumber}
-        placement="inline"
-      />
-
-      <nav className="flex min-w-[320px] items-center justify-end">
+      <nav className="flex flex-1 origin-bottom scale-90 items-center justify-center">
         {previousStep ? (
           <Button
             asChild
@@ -3665,7 +3650,8 @@ function ProductFlowFooter({
         <Button
           className={cn(
             matchedActionButtonClassName,
-            'ml-5 text-white transition-all duration-200',
+            previousStep ? 'ml-5' : '',
+            'text-white transition-all duration-200',
             businessButtonDisabled
               ? 'cursor-not-allowed bg-[#0F172A]/30 text-white/55 hover:bg-[#0F172A]/30'
               : 'hover:brightness-105',
@@ -3682,6 +3668,21 @@ function ProductFlowFooter({
           </span>
         </Button>
       </nav>
+
+      <div className="flex min-w-[320px] items-center justify-end gap-2">
+        <Button asChild className={commonGhostActionClassName} size="lg" variant="ghost">
+          <Link to="/ability/carbon-accounting/mechanism">
+            <LogOut />
+            <span>退出体验</span>
+          </Link>
+        </Button>
+        <FullscreenButton
+          className={commonGhostActionClassName}
+          display="text"
+          textLabel="退出全屏（临时）"
+          variant="ghost"
+        />
+      </div>
     </footer>
   )
 }
@@ -3698,7 +3699,8 @@ function ProductSelectionStepSix({
   const reportCardRef = useRef<HTMLDivElement>(null)
   const leftConfettiRef = useRef<ConfettiRef>(null)
   const rightConfettiRef = useRef<ConfettiRef>(null)
-  const [isReportPreviewOpen, setIsReportPreviewOpen] = useState(false)
+  const [activeReportPage, setActiveReportPage] = useState<typeof stepSixReportPageOrder[number]>('report')
+  const [reportPageDirection, setReportPageDirection] = useState<StepFivePageTurnDirection>('forward')
   const [showReportLoadingCounter, setShowReportLoadingCounter] = useState(true)
   const [showTransitionOverlay, setShowTransitionOverlay] = useState(true)
   const [reportCardSize, setReportCardSize] = useState({ width: 1600, height: 860 })
@@ -3727,6 +3729,17 @@ function ProductSelectionStepSix({
   function fireConfetti() {
     leftConfettiRef.current?.fire({})
     rightConfettiRef.current?.fire({})
+  }
+
+  const openReportPreview = () => {
+    onReportPageSelect('preview-page-1')
+  }
+
+  const onReportPageSelect = (newPage: typeof stepSixReportPageOrder[number]) => {
+    const currentIndex = stepSixReportPageOrder.indexOf(activeReportPage)
+    const newIndex = stepSixReportPageOrder.indexOf(newPage)
+    flushSync(() => setReportPageDirection(newIndex > currentIndex ? 'forward' : 'backward'))
+    setActiveReportPage(newPage)
   }
 
   useEffect(() => {
@@ -3760,7 +3773,7 @@ function ProductSelectionStepSix({
   }, [])
 
   return (
-    <div className="relative flex min-h-0 flex-1 px-[52px] py-5">
+    <div className="relative flex min-h-0 flex-1 px-[144px] py-5">
       <motion.div
         ref={reportCardRef}
         animate={{ opacity: 1, y: 0 }}
@@ -3772,15 +3785,27 @@ function ProductSelectionStepSix({
           outlineColor: `${productResultTheme.resultText}26`,
         }}
       >
-        <NoiseTexture className="absolute inset-0 z-0 opacity-20" frequency={0.8} noiseOpacity={0.35} octaves={4} slope={0.1} />
-        <div
-          className="absolute h-[860px] w-[1600px] origin-top-left overflow-hidden text-white"
-          style={{
-            left: reportOffsetX,
-            top: reportOffsetY,
-            transform: `scale(${reportScale})`,
-          }}
-        >
+        <AnimatePresence custom={reportPageDirection} initial={false} mode="sync">
+          {activeReportPage === 'report' ? (
+            <motion.div
+              key="step-six-report"
+              animate="animate"
+              className="absolute inset-0 overflow-hidden text-white"
+              custom={reportPageDirection}
+              exit="exit"
+              initial="initial"
+              transition={stepFivePageTurnTransition}
+              variants={stepFivePageTurnVariants}
+            >
+              <NoiseTexture className="absolute inset-0 z-0 opacity-20" frequency={0.8} noiseOpacity={0.35} octaves={4} slope={0.1} />
+              <div
+                className="absolute h-[860px] w-[1600px] origin-top-left overflow-hidden text-white"
+                style={{
+                  left: reportOffsetX,
+                  top: reportOffsetY,
+                  transform: `scale(${reportScale})`,
+                }}
+              >
           <div className="absolute inset-y-0 left-0 z-0 w-[63.3%]" style={{ background: reportConfig.leftBackground }} />
           <div className="absolute inset-y-0 right-0 z-0 w-[36.7%]" style={{ background: reportConfig.rightBackground }} />
           <NoiseTexture className="absolute inset-0 z-[1] opacity-100 mix-blend-overlay" frequency={0.78} noiseOpacity={1} octaves={7} slope={0.62} />
@@ -3825,7 +3850,7 @@ function ProductSelectionStepSix({
                     <button
                       className="pointer-events-auto flex h-[57px] w-[187px] items-center justify-center rounded-[0.444em] border-2 border-white bg-white/20 text-[18px] font-medium leading-[25px] text-white shadow-[0_18px_44px_rgba(2,8,23,0.14)] transition-transform duration-200 hover:scale-[1.03] hover:bg-white/28"
                       type="button"
-                      onClick={() => setIsReportPreviewOpen(true)}
+                      onClick={openReportPreview}
                     >
                       <span>预览报告示例</span>
                       <FileText className="ml-[10px] h-[22px] w-[22px] shrink-0" strokeWidth={2.4} />
@@ -3843,8 +3868,62 @@ function ProductSelectionStepSix({
                 </div>
               </div>
             </div>
-          </section>
-        </div>
+              </section>
+            </div>
+          </motion.div>
+          ) : (
+            <motion.div
+              key={activeReportPage}
+              animate="animate"
+              className="absolute inset-0 flex items-center justify-center gap-8 bg-[#F8FAFC] px-[72px] py-[52px]"
+              custom={reportPageDirection}
+              exit="exit"
+              initial="initial"
+              transition={stepFivePageTurnTransition}
+              variants={stepFivePageTurnVariants}
+            >
+              {[0, 1].map((itemIndex) => {
+                const pageIndex = Math.max(0, stepSixReportPageOrder.indexOf(activeReportPage) - 1)
+                const previewIndex = pageIndex * 2 + itemIndex + 1
+
+                return (
+                  <article
+                    key={`report-preview-${previewIndex}`}
+                    aria-label={`真实报告示例第 ${previewIndex} 张`}
+                    className="relative h-full max-h-[760px] w-[min(37vw,538px)] overflow-hidden rounded-[8px] bg-white shadow-[0_16px_45px_rgba(2,8,23,0.21)] ring-1 ring-slate-200/80"
+                  >
+                    <div className="absolute inset-[34px] rounded-[3px] border border-slate-200/70" />
+                    <div className="absolute inset-x-[54px] top-[70px] h-3 rounded-full bg-slate-100" />
+                    <div className="absolute left-[54px] top-[104px] h-2 w-[42%] rounded-full bg-slate-100" />
+                    <div className="absolute inset-x-[54px] top-[154px] space-y-4">
+                      {Array.from({ length: 9 }).map((_, lineIndex) => (
+                        <div
+                          key={`preview-line-${lineIndex}`}
+                          className="h-2 rounded-full bg-slate-100"
+                          style={{ width: `${lineIndex % 3 === 0 ? 86 : lineIndex % 3 === 1 ? 72 : 94}%` }}
+                        />
+                      ))}
+                    </div>
+                    <div
+                      className="absolute left-1/2 top-1/2 whitespace-nowrap font-['PingFang_SC'] text-[42px] font-semibold tracking-[0.08em] text-slate-400/32"
+                      style={{ transform: 'translate(-50%, -50%) rotate(-28deg)' }}
+                    >
+                      真实报告示例（部分）
+                    </div>
+                  </article>
+                )
+              })}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AbilityPageTurnControls
+          activeSection={activeReportPage}
+          iconColor={productResultTheme.rightButtonBackground}
+          sectionOrder={stepSixReportPageOrder}
+          showDisabledButtons
+          showDots={false}
+          onSectionSelect={onReportPageSelect}
+        />
       </motion.div>
 
       {showTransitionOverlay ? (
@@ -3923,32 +4002,6 @@ function ProductSelectionStepSix({
         speedMultiplier={1.2}
         spread={Math.PI * 0.5}
       />
-
-      {isReportPreviewOpen ? (
-        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-[#07111F]/82 px-10 py-10 backdrop-blur-sm" onClick={() => setIsReportPreviewOpen(false)}>
-          <div
-            className="relative flex max-h-full max-w-full items-center justify-center"
-            onClick={(event) => event.stopPropagation()}
-          >
-            <img
-              alt={`${selectedCard.label}产品碳足迹报告`}
-              className="block h-auto max-h-[calc(100vh-80px)] w-auto max-w-[calc(100vw-80px)] object-contain shadow-[0_32px_90px_rgba(2,8,23,0.42)]"
-              src={selectedCard.reportImageSrc}
-            />
-            <button
-              aria-label="关闭报告预览"
-              className="absolute right-4 top-4 z-10 rounded-full bg-white px-4 py-2 text-sm font-medium text-[#181818] shadow-[0_12px_30px_rgba(2,8,23,0.25)]"
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation()
-                setIsReportPreviewOpen(false)
-              }}
-            >
-              关闭
-            </button>
-          </div>
-        </div>
-      ) : null}
     </div>
   )
 }
@@ -3961,6 +4014,7 @@ export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
   const [stepFourBusinessDisabled, setStepFourBusinessDisabled] = useState(false)
   const [stepFourAdvanceRequestKey, setStepFourAdvanceRequestKey] = useState(0)
   const routeState = location.state as {
+    entryTransition?: 'slide-up'
     selectedCardId?: string
     selectedScheme?: 'recommended' | 'custom'
     revealFromStepFour?: boolean
@@ -3973,8 +4027,13 @@ export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
   const selectedCard =
     stepOneCards.find((card) => card.id === selectedCardId) ?? stepOneCards[0]
   const selectedScheme = routeState?.selectedScheme ?? 'recommended'
+  const shouldUseEntrySlideUp = activeStep.step === 'step1' && routeState?.entryTransition === 'slide-up'
 
   useEffect(() => {
+    if (activeStep.step === 'step7') {
+      return undefined
+    }
+
     const readyDelays: Record<string, number> = {
       step1: 480,
       step2: 5200,
@@ -3982,7 +4041,6 @@ export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
       step4: 900,
       step5: routeState?.revealFromStepFour === true ? 1100 : 250,
       step6: STEP_SIX_REPORT_REVEAL_DELAY * 1000 + 250,
-      step7: 900,
     }
     const timeoutId = window.setTimeout(() => {
       setContentReadyStep(activeStep.step)
@@ -3998,7 +4056,7 @@ export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
     step2: '启动数据解构',
     step3: '开启智能建模',
     step4: '启动核算',
-    step5: '一键生成核算报告',
+    step5: '生成核算报告',
     step6: '进入送审环节',
     step7: '完成体验',
   }
@@ -4032,7 +4090,7 @@ export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
     goToNextStep()
   }
   const isBusinessButtonDisabled =
-    contentReadyStep !== activeStep.step ||
+    (activeStep.step !== 'step7' && contentReadyStep !== activeStep.step) ||
     (activeStep.step === 'step4' && stepFourBusinessDisabled) ||
     !businessButtonLabels[activeStep.step]
 
@@ -4079,14 +4137,13 @@ function ProductSelectionStepSeven({
   const scaledOffsetY = Math.max(0, (containerSize.height - stepSevenStageHeight * scale) / 2)
 
   return (
-    <PageTransition>
+    <PageTransition disableOpacity>
       <ScreenShell contentClassName="px-0 py-0">
         <ProductSurfaceBackground backgroundColor={getProductFlowNeutralBackground()} selectedCardId={selectedCard.id} step={activeStep.step} />
 
-        <ProductStepPuzzle selectedCardId={selectedCard.id} step={activeStep.step} />
         <NavControl
           actions={
-            <h1 className="text-right text-[24px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
+            <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
               {activeStep.title}
             </h1>
           }
@@ -4177,7 +4234,7 @@ function ProductSelectionStepSeven({
 
   if (activeStep.step === 'step1') {
     return (
-      <PageTransition variant="slide-up">
+      <PageTransition disableOpacity={!shouldUseEntrySlideUp} variant="slide-up">
         <ProductFlowThreeZoneLayout
           activeColor={getProductReportButtonColor(stepOneActiveCard.id)}
           activeStepTitle={activeStep.title}
@@ -4208,7 +4265,7 @@ function ProductSelectionStepSeven({
 
   if (activeStep.step === 'step2') {
     return (
-      <PageTransition>
+      <PageTransition disableOpacity>
         <ProductFlowThreeZoneLayout
           activeColor={getProductReportButtonColor(selectedCard.id)}
           activeStepTitle={activeStep.title}
@@ -4333,7 +4390,7 @@ function ProductSelectionStepSeven({
                 />
               </Link>
 
-              <h1 className="text-right text-[24px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
+              <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
                 {`${activeStep.title}（${selectedScheme === 'custom' ? '自选方案' : '推荐方案'}）`}
               </h1>
             </header>
@@ -4384,7 +4441,7 @@ function ProductSelectionStepSeven({
                 />
               </Link>
 
-              <h1 className="text-right text-[24px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
+              <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
                 {`${activeStep.title}（${selectedScheme === 'custom' ? '自选方案' : '推荐方案'}）`}
               </h1>
             </header>
@@ -4418,12 +4475,12 @@ function ProductSelectionStepSeven({
   }
 
   return (
-    <PageTransition>
+    <PageTransition disableOpacity>
       <ScreenShell>
         <ProductSurfaceBackground backgroundColor={getProductFlowNeutralBackground()} selectedCardId={selectedCard.id} step={activeStep.step} />
         <ProductStepPuzzle selectedCardId={selectedCard.id} step={activeStep.step} />
         <NavControl
-          actions={<h1 className="text-right text-[24px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">{activeStep.title}</h1>}
+          actions={<h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">{activeStep.title}</h1>}
           showBack={false}
           showHome={false}
           showFullscreen={false}

@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { AnimatePresence, LayoutGroup } from 'framer-motion'
+import { LayoutGroup } from 'framer-motion'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import { productCarbonSteps } from '@/data/productCarbonSteps'
@@ -27,8 +27,7 @@ function App() {
     <LayoutGroup id="app-route-layout">
       <Suspense fallback={<RouteFallback pathname={location.pathname} />}>
         <div className="relative grid min-h-screen w-full bg-[#0b0b0f] [&>*]:[grid-area:1/1]">
-          <AnimatePresence mode="sync">
-            <Routes location={location} key={location.pathname}>
+          <Routes location={location} key={location.pathname}>
             <Route path="/" element={<OverviewPage />} />
             <Route path="/carousel" element={<CarouselPage />} />
             <Route path="/dashboard-config" element={<Navigate to="/company-carbon-dashboard" replace />} />
@@ -47,7 +46,6 @@ function App() {
             ))}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-          </AnimatePresence>
         </div>
       </Suspense>
     </LayoutGroup>

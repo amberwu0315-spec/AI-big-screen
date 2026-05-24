@@ -800,13 +800,13 @@ export function AbilitySchemeOneLanding({
                 <BlurReveal delay={0.36} duration={0.75}>
                   {isCarbonAccounting ? (
                     <div className="mt-[63px] flex items-center justify-center gap-5">
-                      <Link className={heroOutlineActionClassName} to="/product-carbon-flow/step1">
+                      <Link className={heroOutlineActionClassName} state={{ entryTransition: 'slide-up' }} to="/product-carbon-flow/step1">
                         <span className={heroOutlineActionInnerClassName}>
                           产品碳核算
                           <ArrowDown aria-hidden="true" className={heroActionIconClassName} />
                         </span>
                       </Link>
-                      <Link className={heroOutlineActionClassName} to="/enterprise-carbon-dashboard">
+                      <Link className={heroOutlineActionClassName} state={{ entryTransition: 'slide-up' }} to="/enterprise-carbon-dashboard">
                         <span className={heroOutlineActionInnerClassName}>
                           企业碳核算
                           <ArrowDown aria-hidden="true" className={heroActionIconClassName} />

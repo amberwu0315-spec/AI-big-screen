@@ -8,6 +8,7 @@ type FullscreenButtonProps = {
   className?: string
   display?: 'icon' | 'text'
   iconClassName?: string
+  textLabel?: string
 }
 
 type FullscreenDocument = Document & {
@@ -104,7 +105,7 @@ async function requestFullscreen() {
   await fullscreenTarget.msRequestFullscreen?.()
 }
 
-export function FullscreenButton({ variant = 'outline', className, display = 'icon', iconClassName }: FullscreenButtonProps) {
+export function FullscreenButton({ variant = 'outline', className, display = 'icon', iconClassName, textLabel }: FullscreenButtonProps) {
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   useEffect(() => {
@@ -178,7 +179,7 @@ export function FullscreenButton({ variant = 'outline', className, display = 'ic
       {display === 'text' ? (
         <>
           <Icon className={iconClassName} />
-          <span>{isFullscreen ? '退出全屏' : '全屏'}</span>
+          <span>{textLabel ?? (isFullscreen ? '退出全屏' : '全屏')}</span>
         </>
       ) : (
         <Icon className={iconClassName} />
