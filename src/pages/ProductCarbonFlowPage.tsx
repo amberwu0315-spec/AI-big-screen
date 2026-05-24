@@ -359,12 +359,14 @@ function StepFiveRoseChart({
   compact = false,
   style,
   theme,
+  selectedCardId,
 }: {
   className?: string
   compact?: boolean
   labelScale: number
   style?: CSSProperties
   theme: ReturnType<typeof getProductResultTheme>
+  selectedCardId?: string
 }) {
   const chartRef = useRef<HTMLDivElement>(null)
 
@@ -382,7 +384,7 @@ function StepFiveRoseChart({
           type: 'pie',
           radius: compact ? ['14.4%', '67.2%'] : ['14%', '72%'],
           center: compact ? ['45%', '52%'] : ['58%', '52%'],
-          roseType: 'area',
+          roseType: 'radius',
           avoidLabelOverlap: false,
           silent: true,
           itemStyle: {
@@ -1019,17 +1021,17 @@ const stepFourTreeLabels: Record<string, [string, string, string][]> = {
   backpack: [
     ['原材料获取', '原材料生产', '涤纶面料'],
     ['生产制造', '能源使用', '电网供电'],
-    ['分销', '成品运输', '国内货运'],
-    ['最终处置', '产品最终处置', '废弃双肩包的处置'],
+    ['产品分销', '成品运输', '双肩包货车运输'],
+    ['最终处置', '产品最终处置', '废弃双肩包处置'],
   ],
   'lithium-battery': [
     ['原材料获取', '原材料生产', '阳极石墨'],
     ['生产制造', '能源使用', '电网供电'],
-    ['产品分销', '产品运输', '锂电池的运输'],
+    ['产品分销', '成品运输', '锂电池货车运输'],
     ['最终处置', '产品最终处置', '锂电池回收处置'],
   ],
   transformer: [
-    ['原材料获取', '原辅材料的生产', '非晶带材'],
+    ['原材料获取', '原材料生产', '非晶带材'],
     ['生产制造', '能源使用', '电网供电'],
   ],
   formaldehyde: [
@@ -1128,7 +1130,7 @@ const backpackStepTwoRecognitionContent: Record<string, StepTwoRecognitionConten
   'top-left': [
     {
       title: '产品信息',
-      bullets: ['名称：双肩包', '行业：箱包/轻工行业', '型号：1个双肩包'],
+      bullets: ['产品名称：双肩包', '所属行业：轻工行业', '规格型号：1个双肩包'],
     },
   ],
   'top-right': [
@@ -1138,13 +1140,13 @@ const backpackStepTwoRecognitionContent: Record<string, StepTwoRecognitionConten
     },
     {
       title: '参考资料：',
-      bullets: ['PRODUCT CATEGORY RULES (PCR)-LUGGAGE AND HANDBAGS; 产品碳足迹标识认证专用实施规则纺织产品（试行）》'],
+      bullets: ['PRODUCT CATEGORY RULES (PCR)-LUGGAGE AND HANDBAGS'],
     },
   ],
   'bottom-left': [
     {
       title: '生命周期阶段',
-      bullets: ['原材料获取', '生产制造', '分销', '最终处置'],
+      bullets: ['原材料获取', '生产制造', '产品分销', '最终处置'],
     },
   ],
   'bottom-right': [
@@ -1154,7 +1156,7 @@ const backpackStepTwoRecognitionContent: Record<string, StepTwoRecognitionConten
     },
     {
       title: '核算周期',
-      bullets: ['2025年01月01日-2025年12月31日'],
+      bullets: ['20230101-20230630'],
     },
   ],
 }
@@ -1163,7 +1165,7 @@ const lithiumBatteryStepTwoRecognitionContent: Record<string, StepTwoRecognition
   'top-left': [
     {
       title: '产品信息',
-      bullets: ['名称：锂电池', '行业：新能源行业', '型号：1kW·h 锂电池'],
+      bullets: ['产品名称：锂电池', '所属行业：新能源行业', '规格型号：1kW·h锂电池'],
     },
   ],
   'top-right': [
@@ -1173,7 +1175,7 @@ const lithiumBatteryStepTwoRecognitionContent: Record<string, StepTwoRecognition
     },
     {
       title: '参考资料：',
-      bullets: ['生态环境部于2025年3月颁布的环办标征函〔2025〕12号文件《温室气体产品碳足迹量化方法与要求 动力电池（征求意见稿）》'],
+      bullets: ['《温室气体产品碳足迹量化方法与要求动力电池（征求意见稿）》'],
     },
   ],
   'bottom-left': [
@@ -1189,7 +1191,7 @@ const lithiumBatteryStepTwoRecognitionContent: Record<string, StepTwoRecognition
     },
     {
       title: '核算周期',
-      bullets: ['2025年01月01日-2025年12月31日'],
+      bullets: ['20250101-20251231'],
     },
   ],
 }
@@ -1198,17 +1200,13 @@ const formaldehydeStepTwoRecognitionContent: Record<string, StepTwoRecognitionCo
   'top-left': [
     {
       title: '产品信息',
-      bullets: ['名称：甲醛', '行业：化工行业', '型号：1kg甲醛'],
+      bullets: ['产品名称：甲醛', '所属行业：化工行业', '规格型号：1kg甲醛'],
     },
   ],
   'top-right': [
     {
       title: '系统边界',
       bullets: ['从摇篮到大门'],
-    },
-    {
-      title: '参考资料：',
-      bullets: ['暂无专门针对“甲醛”这一特定化学品的PCR，参考国家及通用标准GB/T 24067-2024、ISO 14067。'],
     },
   ],
   'bottom-left': [
@@ -1224,7 +1222,7 @@ const formaldehydeStepTwoRecognitionContent: Record<string, StepTwoRecognitionCo
     },
     {
       title: '核算周期',
-      bullets: ['2025年01月01日-2025年12月31日'],
+      bullets: ['20250101-20251231'],
     },
   ],
 }
@@ -1233,25 +1231,25 @@ const backpackStepThreeDeconstructionContent: Record<string, StepTwoRecognitionC
   'top-left': [
     {
       title: '产品结构',
-      bullets: ['主料：涤纶面料、涤纶里料、背板海绵、合金拉片', '辅料：包边织带、扣具、拉链', '包装：纸箱、吊牌、无纺布袋'],
+      bullets: ['原辅材料：涤纶面料、背板海绵、合金拉片、塑料扣具……', '包装：纸箱、吊牌、无纺布袋'],
     },
   ],
   'top-right': [
     {
-      title: '产品数据',
-      bullets: ['涤纶面料0.22kg', '涤纶里料0.1kg', '耗电量2kwh', '运输距离1000km', '……'],
+      title: '能源消耗',
+      bullets: ['电力'],
     },
   ],
   'bottom-left': [
     {
-      title: '使用阶段假设',
-      bullets: ['依据国际EPD体系《Luggage and handbags》PCR（2022:03），双肩包的使用和维护为可选阶段。由于双肩包使用时无直接能耗，且清洗、维修等行为因用户差异极大，难以建立统一评价场景，故予以排除。该处理符合ISO 14067及GB/T 24067-2024的取舍准则。'],
+      title: '项目执行标准',
+      bullets: ['ISO 14067'],
     },
   ],
   'bottom-right': [
     {
       title: '温室气体量化方法',
-      bullets: ['排放因子法：∑ 活动数据*排放因子*GWP', '质量守恒法：∑ 活动数据∗含碳量*44/12'],
+      bullets: ['排放因子法', '∑活动数据*排放因子*GWP'],
     },
   ],
 }
@@ -1260,25 +1258,25 @@ const lithiumBatteryStepThreeDeconstructionContent: Record<string, StepTwoRecogn
   'top-left': [
     {
       title: '产品结构',
-      bullets: ['名称：1kW·h 锂电池', '主料：阳极石墨、阴极锂锰氧化物', '辅料：六氟磷酸锂、聚氟乙烯', '包装：纸箱、塑料膜'],
+      bullets: ['原辅材料：阳极石墨、阴极锂锰氧化物、阳极铜、阴极铝、六氟磷酸锂…', '包装：纸箱、塑料膜'],
     },
   ],
   'top-right': [
     {
-      title: '产品数据',
-      bullets: ['1kW·h锂电池的BOM表', '阳极石墨 1.06kg', '阴极锂锰氧化物 1.909kg', '……', '耗电量 8.33kWh', '运输距离 1500km'],
+      title: '能源消耗',
+      bullets: ['电力、自来水、天然气'],
     },
   ],
   'bottom-left': [
     {
-      title: '使用阶段假设',
-      bullets: ['根据《温室气体 产品碳足迹量化方法与要求动力电池（征求意见稿）》，系统边界不包含电池使用阶段。'],
+      title: '项目执行标准',
+      bullets: ['ISO 14067'],
     },
   ],
   'bottom-right': [
     {
       title: '温室气体量化方法',
-      bullets: ['排放因子法：∑ 活动数据*排放因子*GWP', '质量守恒法：∑ 活动数据∗含碳量*44/12'],
+      bullets: ['排放因子法', '∑活动数据*排放因子*GWP', '质量守恒法', '∑活动数据*含碳量*44/12'],
     },
   ],
 }
@@ -1287,7 +1285,7 @@ const formaldehydeStepThreeDeconstructionContent: Record<string, StepTwoRecognit
   'top-left': [
     {
       title: '产品结构',
-      bullets: ['主料：甲醇'],
+      bullets: ['原辅材料：甲醇、银触媒、活性炭、液压油'],
     },
   ],
   'top-right': [
@@ -1298,14 +1296,14 @@ const formaldehydeStepThreeDeconstructionContent: Record<string, StepTwoRecognit
   ],
   'bottom-left': [
     {
-      title: '使用阶段假设',
-      bullets: ['对于“摇篮到大门”核算，不涉及使用阶段假设。'],
+      title: '项目执行标准',
+      bullets: ['ISO 14067'],
     },
   ],
   'bottom-right': [
     {
       title: '温室气体量化方法',
-      bullets: ['排放因子法：∑ 活动数据*排放因子*GWP', '质量守恒法：∑ 活动数据*含碳量*44/12'],
+      bullets: ['排放因子法', '∑活动数据*排放因子*GWP'],
     },
   ],
 }
@@ -1314,7 +1312,7 @@ const transformerStepTwoRecognitionContent: Record<string, StepTwoRecognitionCon
   'top-left': [
     {
       title: '产品信息',
-      bullets: ['名称：变压器', '行业：输变电装备制造业', '型号：1台10kV非晶油浸式配电变压器'],
+      bullets: ['产品名称：变压器', '所属行业：电气设备行业', '规格型号：1台非晶油浸式配电变压器'],
     },
   ],
   'top-right': [
@@ -1324,7 +1322,7 @@ const transformerStepTwoRecognitionContent: Record<string, StepTwoRecognitionCon
     },
     {
       title: '参考资料：',
-      bullets: ['团体标准《温室气体 产品碳足迹量化方法与要求 电力变压器》征求意见稿'],
+      bullets: ['团体标准《温室气体 产品碳足迹量化方法与要求 电力变压器（征求意见稿）》'],
     },
   ],
   'bottom-left': [
@@ -1340,7 +1338,7 @@ const transformerStepTwoRecognitionContent: Record<string, StepTwoRecognitionCon
     },
     {
       title: '核算周期',
-      bullets: ['2024年01月01日-2024年12月31日'],
+      bullets: ['20240101-20241231'],
     },
   ],
 }
@@ -1349,25 +1347,25 @@ const transformerStepThreeDeconstructionContent: Record<string, StepTwoRecogniti
   'top-left': [
     {
       title: '产品结构',
-      bullets: ['名称：1台10kV非晶油浸式配电变压器', '主料：非晶带材、扁线…', '辅料：油箱、油盖、线圈、夹件、减震垫…'],
+      bullets: ['原辅材料：非晶带材、聚酯漆包铜扁线、油箱、油盖、减震垫…'],
     },
   ],
   'top-right': [
     {
       title: '能源消耗',
-      bullets: ['电力、氩气、丙烷…'],
+      bullets: ['电力、丙烷、氩气、氮气、氧气'],
     },
   ],
   'bottom-left': [
     {
-      title: '使用阶段假设',
-      bullets: ['对于“摇篮到大门”核算，不涉及使用阶段假设。'],
+      title: '项目执行标准',
+      bullets: ['ISO 14067'],
     },
   ],
   'bottom-right': [
     {
       title: '温室气体量化方法',
-      bullets: ['排放因子法：∑ 活动数据*排放因子*GWP', '质量守恒法：∑ 活动数据∗含碳量*44/12'],
+      bullets: ['排放因子法', '∑活动数据*排放因子*GWP', '质量守恒法', '∑活动数据*含碳量*44/12'],
     },
   ],
 }
@@ -2194,6 +2192,7 @@ function ProductSelectionStepFour({
   const { containerRef, containerSize, scale } = useStageScale(PRODUCT_FLOW_STAGE_WIDTH, PRODUCT_FLOW_STAGE_HEIGHT)
   const [activeTab, setActiveTab] = useState<'recommended' | 'custom'>('recommended')
   const [selectedDetailNode, setSelectedDetailNode] = useState<'material' | 'transport'>('material')
+  const [selectedGroupIndex, setSelectedGroupIndex] = useState<number>(0)
   const [openDropdown, setOpenDropdown] = useState<'component' | 'formula' | 'factor' | null>(null)
   const [isCustomFactorSelected, setIsCustomFactorSelected] = useState<boolean>(false)
   const activeColor = getProductReportButtonColor(selectedCard.id)
@@ -2217,8 +2216,8 @@ function ProductSelectionStepFour({
   const usesTwoStageTree = selectedCard.id === 'transformer' || selectedCard.id === 'formaldehyde'
   const usesMaterialTransportBranch = selectedCard.id === 'transformer' || selectedCard.id === 'formaldehyde'
   const transportBranchLabels = selectedCard.id === 'formaldehyde'
-    ? { levelTwo: '原辅料的运输', levelThree: '甲醇的运输' }
-    : { levelTwo: '原辅料的运输', levelThree: '非晶带材的运输' }
+    ? { levelTwo: '原材料的运输', levelThree: '甲醇货车运输' }
+    : { levelTwo: '原材料运输', levelThree: '非晶带材货车运输' }
   const numGroups = usesTwoStageTree ? 2 : 4
   
   // Compute group centers so the tree visual height (including children) matches the detail panel height
@@ -2554,7 +2553,7 @@ function ProductSelectionStepFour({
             const levelOneTop = center - STEP_FOUR_TREE_NODE_HEIGHT / 2
             const levelTwoTop = center + STEP_FOUR_TREE_CHILD_OFFSET - STEP_FOUR_TREE_NODE_HEIGHT / 2
             const levelThreeTop = center + STEP_FOUR_TREE_CHILD_OFFSET * 2 - STEP_FOUR_TREE_NODE_HEIGHT / 2
-            const isHighlighted = groupIndex === 0
+            const isHighlighted = groupIndex === selectedGroupIndex
             const groupLabels = treeLabels?.[groupIndex]
             const showMaterialTransportBranch = usesMaterialTransportBranch && groupIndex === 0
             const isTransportNodeInteractive = false
@@ -2581,11 +2580,12 @@ function ProductSelectionStepFour({
                       label={groupLabels?.[2]}
                       left={levelThree.left}
                       level={3}
-                      onClick={showMaterialTransportBranch ? () => {
+                      onClick={groupLabels?.[2] !== '电网供电' ? () => {
+                        setSelectedGroupIndex(groupIndex)
                         setSelectedDetailNode('material')
                         setOpenDropdown(null)
                       } : undefined}
-                      showDetailArrow={showMaterialTransportBranch}
+                      showDetailArrow={groupLabels?.[2] !== '电网供电'}
                       top={levelThreeTop}
                       width={levelThree.width}
                     />
@@ -2797,7 +2797,7 @@ function ProductSelectionStepFour({
                 {!(activeTab === 'custom' && !currentLCI.autoSelectCustomFactor && !isCustomFactorSelected) && (
                   <div className="flex items-start justify-between rounded-[20px] bg-[#0F172A]/[0.02] p-6 transition-all duration-300">
                     <div className="flex-1 flex flex-col items-start pl-2">
-                      <div className="text-sm font-semibold text-[#0F172A]/40 mb-1">单位评估结果</div>
+                      <div className="text-sm font-semibold text-[#0F172A]/40 mb-1">单位排放结果</div>
                       <div className="flex items-baseline gap-2 mt-1">
                         <span className="text-[35px] font-bold tracking-tight text-[#0F172A] transition-all leading-none">{currentTotal}</span>
                         <span className="text-lg font-bold text-[#0F172A]/60">kgCO<sub>2</sub>e</span>
@@ -2805,7 +2805,7 @@ function ProductSelectionStepFour({
                     </div>
                     
                     <div className="flex-1 flex flex-col items-start border-l border-[#0F172A]/5 pl-8">
-                      <div className="text-sm font-semibold text-[#0F172A]/40 mb-1">不确定性区间</div>
+                      <div className="text-sm font-semibold text-[#0F172A]/40 mb-1">不确定性范围</div>
                       <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -3007,11 +3007,43 @@ function ProductSelectionStepFive({
   const [activeSection, setActiveSection] = useState<typeof sectionOrder[number]>('overview')
   const [pageTurnDirection, setPageTurnDirection] = useState<StepFivePageTurnDirection>('forward')
   const productResultTheme = getProductResultTheme(selectedCard.id)
+  const topFiveItems = selectedCard.id === 'backpack' ? [
+    { height: 500, name: '涤纶面料', percentage: '39.44%', unit: 'kgCO₂e', value: '5.65' },
+    { height: 420, name: '涤纶里料', percentage: '17.93%', unit: 'kgCO₂e', value: '2.57' },
+    { height: 340, name: '涤纶织带', percentage: '13.45%', unit: 'kgCO₂e', value: '1.93' },
+    { height: 280, name: '电网供电', percentage: '8.66%', unit: 'kgCO₂e', value: '1.24' },
+    { height: 220, name: '涤纶包边带', percentage: '7.17%', unit: 'kgCO₂e', value: '1.03' },
+  ] : selectedCard.id === 'lithium-battery' ? [
+    { height: 500, name: '阳极石墨', percentage: '39.4%', unit: 'kgCO₂e', value: '49.86' },
+    { height: 420, name: '六氟磷酸锂', percentage: '17.07%', unit: 'kgCO₂e', value: '21.60' },
+    { height: 340, name: '阴极铝', percentage: '14.51%', unit: 'kgCO₂e', value: '18.36' },
+    { height: 280, name: '阴极锂锰氧化物', percentage: '8.66%', unit: 'kgCO₂e', value: '10.96' },
+    { height: 220, name: '天然气的燃烧', percentage: '6.33%', unit: 'kgCO₂e', value: '8.01' },
+  ] : selectedCard.id === 'transformer' ? [
+    { height: 500, name: '非晶带材', percentage: '49.65%', unit: 'kgCO₂e', value: '4277.50' },
+    { height: 420, name: '油箱', percentage: '15.06%', unit: 'kgCO₂e', value: '1297.46' },
+    { height: 340, name: '聚酯漆包铜扁线', percentage: '15.04%', unit: 'kgCO₂e', value: '1295.74' },
+    { height: 280, name: '铜带', percentage: '7.44%', unit: 'kgCO₂e', value: '640.97' },
+    { height: 220, name: '变压器油', percentage: '3.75%', unit: 'kgCO₂e', value: '323.07' },
+  ] : selectedCard.id === 'formaldehyde' ? [
+    { height: 500, name: '甲醇的生产', percentage: '97.85%', unit: 'kgCO₂e', value: '1.33' },
+    { height: 420, name: '电网供电', percentage: '1.22%', unit: 'kgCO₂e', value: '0.016' },
+    { height: 340, name: '甲醇的运输', percentage: '0.73%', unit: 'kgCO₂e', value: '0.009' },
+    { height: 280, name: '自来水', percentage: '0.20%', unit: 'kgCO₂e', value: '0.002' },
+    { height: 220, name: '废水处置', percentage: '0.01%', unit: 'kgCO₂e', value: '0.0001' },
+  ] : [
+    { height: 500, name: '运输配送过程', percentage: '42.8%', unit: 'kgCO₂e', value: '6.74296' },
+    { height: 420, name: '包装纸箱材料', percentage: '31.4%', unit: 'kgCO₂e', value: '5.28741' },
+    { height: 340, name: '拉链金属配件', percentage: '23.6%', unit: 'kgCO₂e', value: '4.09325' },
+    { height: 280, name: '聚酯纤维辅料', percentage: '18.2%', unit: 'kgCO₂e', value: '3.12864' },
+    { height: 220, name: '再生涤纶面料', percentage: '12.5%', unit: 'kgCO₂e', value: '2.45678' },
+  ]
+
   const rightCards: StepFiveDrilldownCard[] = [
     {
       id: 'stage-share',
       Icon: PieChart,
-      cardText: '阶段-排放占比\n最高：XXXXXXXXXXX',
+      cardText: `阶段排放占比\n最高：原材料获取阶段`,
       titleLine: '阶段',
       highlight: '排放占比',
       path: '核算结果概览 > 阶段-排放占比',
@@ -3020,7 +3052,7 @@ function ProductSelectionStepFive({
     {
       id: 'process-top5',
       Icon: BarChart3,
-      cardText: '单元过程-排放TOP5\n最高：XXXXXXXXXXX',
+      cardText: `单元过程排放占比TOP5\n最高：${topFiveItems[0].name}`,
       titleLine: '单元过程',
       highlight: '排放TOP5',
       path: '核算结果概览 > 单元过程-排放TOP5',
@@ -3029,7 +3061,7 @@ function ProductSelectionStepFive({
     {
       id: 'process-share',
       Icon: GitBranch,
-      cardText: '单元过程-排放占比\n流向情况',
+      cardText: '单元过程排放占比\n流向情况',
       titleLine: '单元过程',
       highlight: '排放占比流向',
       path: '核算结果概览 > 单元过程-排放流向',
@@ -3046,13 +3078,6 @@ function ProductSelectionStepFive({
   const showDrilldown = (id: StepFiveDrilldownCard['id']) => onSectionSelect(id)
   const returnToOverview = () => onSectionSelect('overview')
   const siblingDrilldownCards = rightCards.filter((card) => card.id !== activeSection)
-  const topFiveItems = [
-    { height: 500, name: '运输配送过程', percentage: '42.8%', unit: 'kgCO₂e', value: '6.74296' },
-    { height: 420, name: '包装纸箱材料', percentage: '31.4%', unit: 'kgCO₂e', value: '5.28741' },
-    { height: 340, name: '拉链金属配件', percentage: '23.6%', unit: 'kgCO₂e', value: '4.09325' },
-    { height: 280, name: '聚酯纤维辅料', percentage: '18.2%', unit: 'kgCO₂e', value: '3.12864' },
-    { height: 220, name: '再生涤纶面料', percentage: '12.5%', unit: 'kgCO₂e', value: '2.45678' },
-  ]
   const resultContentPadding = 40
   const resultDesignHeight = 1040
   const resultMinimumContentWidth = 1180
@@ -3246,6 +3271,7 @@ function ProductSelectionStepFive({
                   labelScale={drilldownContentScale}
                   style={{ width: drilldownChartSize.roseWidth, height: drilldownChartSize.roseHeight }}
                   theme={productResultTheme}
+                  selectedCardId={selectedCard.id}
                 />
               )}
 
@@ -3389,52 +3415,52 @@ function ProductSelectionStepFive({
             </div>
           </div>
 
-          <div className="absolute bottom-[30px] left-0 h-[473px] w-[873px]">
+          <div className="absolute bottom-[30px] left-0 h-[473px] min-w-[873px] w-max">
             <div
-              className="flex h-[473px] w-[873px] origin-bottom-left flex-col items-start gap-5"
+              className="flex h-[473px] min-w-[873px] w-max origin-bottom-left flex-col items-start gap-5"
               style={{ transform: `scale(${resultContentScale})` }}
             >
                 <section
-                  className="flex h-[219px] w-[579px] flex-none flex-col items-start justify-end gap-5 rounded-[20px] px-[50px] py-[30px] shadow-[0_6px_18px_rgba(15,23,42,0.12)]"
+                  className="flex h-[219px] min-w-[579px] w-max flex-none flex-col items-start justify-end gap-5 rounded-[20px] px-[50px] py-[30px] shadow-[0_6px_18px_rgba(15,23,42,0.12)]"
                   style={{ backgroundColor: productResultTheme.resultCardBackground }}
                 >
-                  <div className="flex h-[97px] w-[479px] items-end gap-5">
-                    <span className="h-[97px] w-[318px] font-['Inter'] text-[80px] font-semibold leading-[97px] text-white">
-                      12.3546
+                  <div className="flex h-[97px] w-full items-end gap-[20px]">
+                    <span className="h-[97px] whitespace-nowrap font-['Inter'] text-[80px] font-semibold leading-[97px] text-white">
+                      {selectedCard.id === 'backpack' ? '14.33' : selectedCard.id === 'lithium-battery' ? '126.57' : selectedCard.id === 'transformer' ? '8615.32' : '1.36'}
                     </span>
-                    <span className="h-[60px] w-[141px] font-['Inter'] text-[30px] font-semibold leading-[2] text-white">
-                      kgCO<sub>2</sub>/件
+                    <span className="h-[60px] whitespace-nowrap font-['Inter'] text-[30px] font-semibold leading-[2] text-white">
+                      {selectedCard.id === 'backpack' ? <>kgCO<sub>2</sub>e/件</> : selectedCard.id === 'lithium-battery' ? <>kgCO<sub>2</sub>e/kW·h</> : selectedCard.id === 'transformer' ? <>kgCO<sub>2</sub>e/台</> : <>kgCO<sub>2</sub>e/kg</>}
                     </span>
                   </div>
-                  <p className="h-[42px] w-[319px] font-['PingFang_SC'] text-[30px] font-semibold leading-[42px] text-white">
-                    核算产品-单位评估结果
+                  <p className="h-[42px] w-full font-['PingFang_SC'] text-[30px] font-semibold leading-[42px] text-white">
+                    单位排放结果
                   </p>
                 </section>
 
-                <section className="flex h-[234px] w-full flex-none flex-col items-start justify-end gap-5 rounded-[20px] bg-white px-[50px] py-[30px] shadow-[0_6px_18px_rgba(15,23,42,0.12)]">
-                  <div className="flex h-[112px] w-[765px] items-center gap-[50px]">
-                    <div className="flex h-[112px] w-[298px] items-end gap-5">
-                      <span className="h-[112px] w-[248px] font-['PingFang_SC'] text-[80px] font-semibold leading-[112px]" style={{ color: productResultTheme.intervalText }}>
-                        -15.55
+                <section className="flex h-[234px] min-w-[873px] w-max flex-none flex-col items-start justify-end gap-5 rounded-[20px] bg-white px-[50px] py-[30px] shadow-[0_6px_18px_rgba(15,23,42,0.12)]">
+                  <div className="flex h-[112px] w-full items-center gap-[50px]">
+                    <div className="flex h-[112px] items-end gap-[20px]">
+                      <span className="h-[112px] whitespace-nowrap font-['PingFang_SC'] text-[80px] font-semibold leading-[112px]" style={{ color: productResultTheme.intervalText }}>
+                        {selectedCard.id === 'backpack' ? '-14.34' : selectedCard.id === 'lithium-battery' ? '-8.01' : selectedCard.id === 'transformer' ? '-16.87' : '-15.47'}
                       </span>
-                      <span className="h-[60px] w-[30px] font-['PingFang_SC'] text-[30px] font-semibold leading-[2]" style={{ color: productResultTheme.intervalText }}>
+                      <span className="h-[60px] whitespace-nowrap font-['PingFang_SC'] text-[30px] font-semibold leading-[2]" style={{ color: productResultTheme.intervalText }}>
                         %
                       </span>
                     </div>
-                    <span className="h-[97px] w-[54px] font-['Inter'] text-[80px] font-semibold leading-[97px]" style={{ color: productResultTheme.intervalText }}>
+                    <span className="h-[97px] whitespace-nowrap font-['Inter'] text-[80px] font-semibold leading-[97px]" style={{ color: productResultTheme.intervalText }}>
                       ~
                     </span>
-                    <div className="flex h-[112px] w-[313px] items-end gap-5">
-                      <span className="h-[112px] w-[263px] font-['PingFang_SC'] text-[80px] font-semibold leading-[112px]" style={{ color: productResultTheme.intervalText }}>
-                        +20.66
+                    <div className="flex h-[112px] items-end gap-[20px]">
+                      <span className="h-[112px] whitespace-nowrap font-['PingFang_SC'] text-[80px] font-semibold leading-[112px]" style={{ color: productResultTheme.intervalText }}>
+                        {selectedCard.id === 'backpack' ? '14.34' : selectedCard.id === 'lithium-battery' ? '8.01' : selectedCard.id === 'transformer' ? '16.87' : '15.47'}
                       </span>
-                      <span className="h-[60px] w-[30px] font-['PingFang_SC'] text-[30px] font-semibold leading-[2]" style={{ color: productResultTheme.intervalText }}>
+                      <span className="h-[60px] whitespace-nowrap font-['PingFang_SC'] text-[30px] font-semibold leading-[2]" style={{ color: productResultTheme.intervalText }}>
                         %
                       </span>
                     </div>
                   </div>
-                  <p className="h-[42px] w-[289px] font-['PingFang_SC'] text-[30px] font-semibold leading-[42px]" style={{ color: productResultTheme.intervalText }}>
-                  核算产品-不确定区间
+                  <p className="h-[42px] w-full font-['PingFang_SC'] text-[30px] font-semibold leading-[42px]" style={{ color: productResultTheme.intervalText }}>
+                  不确定性范围
                 </p>
               </section>
             </div>
@@ -3455,7 +3481,7 @@ function ProductSelectionStepFive({
                   <div className="absolute left-[30px] top-1/2 flex h-[70px] w-[70px] -translate-y-1/2 items-center justify-center rounded-[0.625em]" style={{ backgroundColor: productResultTheme.rightCardText }}>
                     <Icon className="h-[38px] w-[38px] text-white" strokeWidth={2.6} />
                   </div>
-                  <p className="absolute left-[120.78px] top-1/2 h-[84px] w-[310px] -translate-y-1/2 whitespace-pre-line font-['PingFang_SC'] text-[30px] font-semibold leading-[42px]" style={{ color: productResultTheme.rightCardText }}>
+                  <p className="absolute left-[120.78px] top-1/2 h-[84px] w-[410px] -translate-y-1/2 whitespace-pre font-['PingFang_SC'] text-[30px] font-semibold leading-[42px]" style={{ color: productResultTheme.rightCardText }}>
                     {cardText}
                   </p>
                   <svg
