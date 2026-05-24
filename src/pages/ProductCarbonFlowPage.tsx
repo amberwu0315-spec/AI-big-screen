@@ -256,13 +256,13 @@ function getStepNumber(step: string) {
 function ProductStepPuzzle({ selectedCardId, step }: { selectedCardId: string; step: string }) {
   const stepNumber = getStepNumber(step)
 
-  if (stepNumber < 1 || stepNumber > 6) {
+  if (stepNumber < 1 || stepNumber > 7) {
     return null
   }
 
   const activeColor = getProductReportButtonColor(selectedCardId)
 
-  return <ProductPuzzleProgress activeColor={activeColor} activeStepNumber={stepNumber} />
+  return <ProductPuzzleProgress activeColor={activeColor} activeStepNumber={stepNumber} animateOnComplete={stepNumber < 7} />
 }
 
 function getProductFlowNeutralBackground() {
@@ -336,6 +336,30 @@ function colorWithOpacity(hex: string, opacity: number) {
   const color = Number.parseInt(normalizedValue, 16)
 
   return `rgba(${(color >> 16) & 255}, ${(color >> 8) & 255}, ${color & 255}, ${opacity})`
+}
+
+function StepFiveGridBackground({
+  color,
+  opacity = 0.4,
+}: {
+  color: string
+  opacity?: number
+}) {
+  const gridColor = colorWithOpacity(color, opacity)
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0"
+      data-step-five-grid-background
+      style={{
+        backgroundImage: `linear-gradient(to right, ${gridColor} 1px, transparent 1px), linear-gradient(to bottom, ${gridColor} 1px, transparent 1px)`,
+        backgroundSize: '3rem 3rem',
+        maskImage: 'radial-gradient(ellipse 64% 56% at 50% 0%, #000 62%, transparent 112%)',
+        WebkitMaskImage: 'radial-gradient(ellipse 64% 56% at 50% 0%, #000 62%, transparent 112%)',
+      }}
+    />
+  )
 }
 
 function StepFiveRoseChart({
@@ -3115,6 +3139,8 @@ function ProductSelectionStepFive({
               transition={stepFivePageTurnTransition}
               variants={stepFivePageTurnVariants}
             >
+              <StepFiveGridBackground color={productResultTheme.rightCardText} />
+
               <div
                 className="absolute left-10 top-10 flex justify-start font-['PingFang_SC'] font-medium text-[#64748B]"
                 style={drilldownPathStyle}
@@ -3319,14 +3345,7 @@ function ProductSelectionStepFive({
               variants={stepFivePageTurnVariants}
             >
               <NoiseTexture className="absolute inset-0 opacity-30" frequency={0.8} noiseOpacity={0.35} octaves={4} slope={0.1} />
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-0"
-                style={{
-                  backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)',
-                  backgroundSize: '3rem 3rem',
-                }}
-              />
+              <StepFiveGridBackground color={productResultTheme.resultText} />
               <div className="pointer-events-none absolute inset-0 bg-white/10" />
               <img
                 alt={selectedCard.label}
@@ -3871,14 +3890,16 @@ function ProductSelectionStepSeven({
   ]
   const reportConfig = stepSixReportConfigs[selectedCard.id] ?? stepSixReportConfigs.backpack
   const themeColor = reportConfig.leftDeepColor
-  const { containerRef, containerSize, scale } = useStageScale(1440, 680)
+  const stepSevenStageWidth = 1920
+  const stepSevenStageHeight = 1080
+  const { containerRef, containerSize, scale } = useStageScale(stepSevenStageWidth, stepSevenStageHeight)
   
-  const scaledOffsetX = Math.max(0, (containerSize.width - 1440 * scale) / 2)
-  const scaledOffsetY = Math.max(0, (containerSize.height - 680 * scale) / 2)
+  const scaledOffsetX = Math.max(0, (containerSize.width - stepSevenStageWidth * scale) / 2)
+  const scaledOffsetY = Math.max(0, (containerSize.height - stepSevenStageHeight * scale) / 2)
 
   return (
     <PageTransition>
-      <ScreenShell>
+      <ScreenShell contentClassName="px-0 py-0">
         <ProductSurfaceBackground backgroundColor={getProductFlowNeutralBackground()} selectedCardId={selectedCard.id} step={activeStep.step} />
 
         <ProductStepPuzzle selectedCardId={selectedCard.id} step={activeStep.step} />
@@ -3900,10 +3921,10 @@ function ProductSelectionStepSeven({
           />
         </div>
         
-        <section ref={containerRef} className="relative z-20 flex min-h-0 flex-1 items-center justify-center pt-16 w-full h-full overflow-hidden">
+        <section ref={containerRef} className="relative z-20 flex h-screen min-h-0 w-full items-center justify-center overflow-hidden supports-[height:100dvh]:h-dvh">
           <div className="relative shrink-0 w-full h-full">
             <div 
-              className="absolute left-0 top-0 flex h-[680px] w-[1440px] origin-top-left flex-col items-center justify-center" 
+              className="absolute left-0 top-0 flex h-[1080px] w-[1920px] origin-top-left flex-col items-center justify-center" 
               style={{
                 transform: `translate(${scaledOffsetX}px, ${scaledOffsetY}px) scale(${scale})`,
               }}
@@ -3924,7 +3945,7 @@ function ProductSelectionStepSeven({
               </motion.div>
               
               <motion.div 
-                className="grid w-full grid-cols-4 gap-5 px-8"
+                className="grid w-[1440px] grid-cols-4 gap-5 px-8"
                 variants={{
                   hidden: { opacity: 0 },
                   show: { opacity: 1, transition: { staggerChildren: 0.08 } }
@@ -4091,6 +4112,7 @@ function ProductSelectionStepSeven({
     return (
       <PageTransition disableOpacity>
         <ScreenShell contentClassName="px-0 py-0">
+          <ProductSurfaceBackground backgroundColor={getProductFlowNeutralBackground()} selectedCardId={selectedCard.id} step={activeStep.step} />
           <section className="relative z-20 flex min-h-screen w-full flex-col supports-[height:100dvh]:min-h-dvh">
             <header className="flex h-20 shrink-0 items-center justify-between px-10">
               <Link className="flex h-9 items-center" to="/">
@@ -4145,6 +4167,7 @@ function ProductSelectionStepSeven({
     return (
       <PageTransition disableOpacity>
         <ScreenShell contentClassName="px-0 py-0">
+          <ProductSurfaceBackground backgroundColor={getProductFlowNeutralBackground()} selectedCardId={selectedCard.id} step={activeStep.step} />
           <section className="relative z-20 flex min-h-screen w-full flex-col supports-[height:100dvh]:min-h-dvh">
             <header className="flex h-20 shrink-0 items-center justify-between px-10">
               <Link className="flex h-9 items-center" to="/">

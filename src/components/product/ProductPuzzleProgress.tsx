@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils'
 type ProductPuzzleProgressProps = {
   activeStepNumber: number
   activeColor?: string
+  animateOnComplete?: boolean
   className?: string
   placement?: 'absolute' | 'inline'
   style?: CSSProperties
@@ -38,12 +39,13 @@ function getViewportSize() {
 export function ProductPuzzleProgress({
   activeColor = '#22D3EE',
   activeStepNumber,
+  animateOnComplete = true,
   className,
   placement = 'absolute',
   style,
 }: ProductPuzzleProgressProps) {
   const [viewportSize, setViewportSize] = useState(getViewportSize)
-  const isComplete = activeStepNumber >= 7
+  const isComplete = animateOnComplete && activeStepNumber >= 7
   const highlightedPieceCount = Math.min(puzzlePieces.length, Math.max(0, activeStepNumber - 1))
   const centerX = (viewportSize.width - puzzleSize) / 2
   const centerY = (viewportSize.height - puzzleSize) / 2
