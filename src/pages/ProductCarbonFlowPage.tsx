@@ -20,7 +20,6 @@ import { NavControl } from '@/components/common/NavControl'
 import { PageTransition } from '@/components/common/PageTransition'
 import { useElementFitScale } from '@/components/common/ScaledStage'
 import { ScreenShell } from '@/components/common/ScreenShell'
-import { AbilityPageTurnControls } from '@/components/ability/AbilityPageTurnControls'
 import { Confetti, type ConfettiRef } from '@/components/magicui/Confetti'
 import { NeonBorder } from '@/components/magicui/NeonBorder'
 import { CardScanOverlay } from '@/components/product/CardScanOverlay'
@@ -2957,12 +2956,8 @@ function ProductSelectionStepFive({
   selectedCard: ProductCard
   onAdvance: () => void
 }) {
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const [wrapperSize, setWrapperSize] = useState({ width: 1760, height: 1040 })
-  const VIRTUAL_WIDTH = 1800
-  const VIRTUAL_HEIGHT = 1040
-  const globalScale = Math.min(wrapperSize.width / VIRTUAL_WIDTH, wrapperSize.height / VIRTUAL_HEIGHT)
-  const virtualSize = { width: VIRTUAL_WIDTH, height: VIRTUAL_HEIGHT }
+  const resultCardRef = useRef<HTMLDivElement>(null)
+  const [resultCardSize, setResultCardSize] = useState({ width: 1600, height: 860 })
   const sectionOrder = ['overview', 'stage-share', 'process-top5', 'process-share'] as const
   const [activeSection, setActiveSection] = useState<typeof sectionOrder[number]>('overview')
   const [pageTurnDirection, setPageTurnDirection] = useState<StepFivePageTurnDirection>('forward')
@@ -3003,6 +2998,9 @@ function ProductSelectionStepFive({
     flushSync(() => setPageTurnDirection(newIndex > currentIndex ? 'forward' : 'backward'))
     setActiveSection(newSection)
   }
+  const showDrilldown = (id: StepFiveDrilldownCard['id']) => onSectionSelect(id)
+  const returnToOverview = () => onSectionSelect('overview')
+  const siblingDrilldownCards = rightCards.filter((card) => card.id !== activeSection)
   const topFiveItems = [
     { height: 500, name: '运输配送过程', percentage: '42.8%', unit: 'kgCO₂e', value: '6.74296' },
     { height: 420, name: '包装纸箱材料', percentage: '31.4%', unit: 'kgCO₂e', value: '5.28741' },
