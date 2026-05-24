@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { AnimatePresence, animate, motion, useMotionValue, useTransform, type Transition } from 'framer-motion'
 import { PieChart as EChartsPieChart, SankeyChart } from 'echarts/charts'
 import { init, use as useECharts, type EChartsCoreOption, type EChartsType } from 'echarts/core'
@@ -340,7 +340,7 @@ function colorWithOpacity(hex: string, opacity: number) {
 
 function StepFiveGridBackground({
   color,
-  opacity = 0.4,
+  opacity = 0.2,
 }: {
   color: string
   opacity?: number
@@ -1685,8 +1685,10 @@ const stepTwoAnnotations: CardAnnotation[] = [
 ]
 
 function ProductSelectorCarousel({
+  onActiveCardChange,
   onSelect,
 }: {
+  onActiveCardChange?: (card: ProductCard) => void
   onSelect: (card: ProductCard) => void
 }) {
   const [activeIndex, setActiveIndex] = useState(0)
@@ -1699,6 +1701,10 @@ function ProductSelectorCarousel({
   }))
 
   const currentCard = getLoopedStepOneCard(activeIndex)
+
+  useEffect(() => {
+    onActiveCardChange?.(currentCard)
+  }, [currentCard, onActiveCardChange])
 
   const handleSlotClick = (slot: number) => {
     const card = getLoopedStepOneCard(activeIndex + slot)
@@ -1803,7 +1809,7 @@ function ProductSelectorCarousel({
 
         <motion.div
           animate={{ opacity: 1, y: 0 }}
-          className="absolute left-1/2 z-10 -translate-x-1/2"
+          className="hidden"
           initial={{ opacity: 0, y: 10 }}
           style={{ top: STEP_ONE_ACTION_BUTTON_TOP_OFFSET }}
           transition={{ delay: 0.4, duration: 0.24, ease: 'linear' }}
@@ -1980,7 +1986,7 @@ function ProductSelectionStepTwo({
 
         <motion.div
           animate={{ opacity: isAdvancing ? 0 : 1, y: isAdvancing ? 10 : 0 }}
-          className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2"
+          className="hidden"
           initial={{ opacity: 0, y: 10 }}
           style={{ top: `calc(50% + ${STEP_TWO_ACTION_BUTTON_TOP_OFFSET}px)` }}
           transition={{ delay: isAdvancing ? 0 : 5, duration: 0.24, ease: 'linear' }}
@@ -2149,7 +2155,7 @@ function ProductSelectionStepThree({
 
         <motion.div
           animate={{ opacity: isAdvancing ? 0 : 1, y: isAdvancing ? 10 : 0 }}
-          className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2"
+          className="hidden"
           initial={{ opacity: 0, y: 10 }}
           style={{ top: `calc(50% + ${STEP_TWO_ACTION_BUTTON_TOP_OFFSET}px)` }}
           transition={{ delay: isAdvancing ? 0 : 5, duration: 0.24, ease: 'linear' }}
@@ -2187,9 +2193,13 @@ function ProductSelectionStepThree({
 }
 
 function ProductSelectionStepFour({
+  advanceRequestKey,
+  onBusinessDisabledChange,
   selectedCard,
   onAdvance,
 }: {
+  advanceRequestKey: number
+  onBusinessDisabledChange: (disabled: boolean) => void
   selectedCard: ProductCard
   onAdvance: (scheme: 'recommended' | 'custom') => void
 }) {
@@ -2205,6 +2215,7 @@ function ProductSelectionStepFour({
   const [transitionPhase, setTransitionPhase] = useState<'none' | 'moving' | 'scanning' | 'revealing' | 'completed'>('none')
   const [isHandingOffToStepFive, setIsHandingOffToStepFive] = useState(false)
   const [progress, setProgress] = useState(0)
+  const handleAdvanceRef = useRef<() => void>(() => undefined)
 
   const isTransitioning = transitionPhase !== 'none'
   const isScanning = transitionPhase === 'scanning' || transitionPhase === 'revealing' || transitionPhase === 'completed'
@@ -2317,7 +2328,7 @@ function ProductSelectionStepFour({
     ? (currentLCI.autoSelectCustomFactor || isCustomFactorSelected ? formatLciNumber(currentLCI.cusTotal) : '---')
     : formatLciNumber(currentLCI.recTotal)
 
-  const handleAdvance = () => {
+  const handleAdvance = useCallback(() => {
     if (transitionPhase !== 'none') return
     setTransitionPhase('moving')
     
@@ -2325,7 +2336,11 @@ function ProductSelectionStepFour({
     setTimeout(() => {
       setTransitionPhase('scanning')
     }, 1000)
-  }
+  }, [transitionPhase])
+
+  useEffect(() => {
+    handleAdvanceRef.current = handleAdvance
+  }, [handleAdvance])
 
   // Handle scanning phase progress animation
   useEffect(() => {
@@ -2385,6 +2400,24 @@ function ProductSelectionStepFour({
 
   const isButtonDisabled = (activeTab === 'custom' && !currentLCI.autoSelectCustomFactor && !isCustomFactorSelected) || transitionPhase !== 'none'
   const detailWidth = PRODUCT_FLOW_STAGE_WIDTH - STEP_FOUR_DETAIL_LEFT - STEP_FOUR_PRODUCT_CARD_LEFT
+
+  useEffect(() => {
+    onBusinessDisabledChange(isButtonDisabled)
+  }, [isButtonDisabled, onBusinessDisabledChange])
+
+  useEffect(() => {
+    if (advanceRequestKey <= 0 || isButtonDisabled) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      handleAdvanceRef.current()
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [advanceRequestKey, isButtonDisabled])
   const renderActivityDataCard = ({
     dqi,
     ref,
@@ -2940,7 +2973,7 @@ function ProductSelectionStepFour({
               <Button
                 asChild
                 className={cn(
-                  "h-12 rounded-[0.875em] px-8 text-base font-semibold shadow-lg transition-all duration-200",
+                  "hidden h-12 rounded-[0.875em] px-8 text-base font-semibold shadow-lg transition-all duration-200",
                   isButtonDisabled
                     ? "bg-[#0F172A]/30 text-white/50 cursor-not-allowed pointer-events-none"
                     : "text-white hover:scale-[1.03] hover:brightness-110"
@@ -3139,7 +3172,7 @@ function ProductSelectionStepFive({
               transition={stepFivePageTurnTransition}
               variants={stepFivePageTurnVariants}
             >
-              <StepFiveGridBackground color={productResultTheme.rightCardText} />
+              <StepFiveGridBackground color={productResultTheme.rightButtonBackground} />
 
               <div
                 className="absolute left-10 top-10 flex justify-start font-['PingFang_SC'] font-medium text-[#64748B]"
@@ -3207,7 +3240,7 @@ function ProductSelectionStepFive({
                     </p>
                   </button>
                   <button
-                    className="flex h-[127px] w-[587px] flex-none items-center justify-center rounded-[0.5em] font-['PingFang_SC'] text-[40px] font-semibold leading-[56px] text-white shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition-transform duration-200 hover:scale-[1.015]"
+                    className="hidden h-[127px] w-[587px] flex-none items-center justify-center rounded-[0.5em] font-['PingFang_SC'] text-[40px] font-semibold leading-[56px] text-white shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition-transform duration-200 hover:scale-[1.015]"
                     style={{ backgroundColor: productResultTheme.rightButtonBackground }}
                     type="button"
                     onClick={onAdvance}
@@ -3345,7 +3378,7 @@ function ProductSelectionStepFive({
               variants={stepFivePageTurnVariants}
             >
               <NoiseTexture className="absolute inset-0 opacity-30" frequency={0.8} noiseOpacity={0.35} octaves={4} slope={0.1} />
-              <StepFiveGridBackground color={productResultTheme.resultText} />
+              <StepFiveGridBackground color={productResultTheme.rightButtonBackground} />
               <div className="pointer-events-none absolute inset-0 bg-white/10" />
               <img
                 alt={selectedCard.label}
@@ -3452,7 +3485,7 @@ function ProductSelectionStepFive({
               ))}
 
               <button
-                className="pointer-events-auto flex h-[127px] w-[587px] flex-none items-center justify-center rounded-[0.5em] font-['PingFang_SC'] text-[40px] font-semibold leading-[56px] text-white shadow-[0_8px_18px_rgba(15,23,42,0.08)]"
+                className="hidden h-[127px] w-[587px] flex-none items-center justify-center rounded-[0.5em] font-['PingFang_SC'] text-[40px] font-semibold leading-[56px] text-white shadow-[0_8px_18px_rgba(15,23,42,0.08)]"
                 style={{ backgroundColor: productResultTheme.rightButtonBackground }}
                 type="button"
                 onClick={onAdvance}
@@ -3496,18 +3529,26 @@ function ProductSurfaceBackground({ backgroundColor, selectedCardId, step }: { b
 function ProductFlowThreeZoneLayout({
   activeColor,
   activeStepTitle,
+  businessButtonDisabled,
+  businessButtonLabel,
+  onBusinessButtonClick,
   children,
   footerTitle,
-  headerActions,
+  previousStep,
   selectedCardId,
+  selectedScheme,
   step,
 }: {
   activeColor: string
   activeStepTitle: string
+  businessButtonDisabled?: boolean
+  businessButtonLabel: string
+  onBusinessButtonClick: () => void
   children: ReactNode
   footerTitle?: string
-  headerActions: ReactNode
+  previousStep?: { step: string }
   selectedCardId: string
+  selectedScheme?: 'recommended' | 'custom'
   step: string
 }) {
   const stepNumber = getStepNumber(step)
@@ -3536,22 +3577,112 @@ function ProductFlowThreeZoneLayout({
           {children}
         </div>
 
-        <footer className="flex h-20 shrink-0 items-center justify-between px-10">
-          <ProductPuzzleProgress
-            activeColor={progressColor}
-            activeStepNumber={stepNumber}
-            placement="inline"
-          />
-          <nav className="flex items-center gap-2">
-            {headerActions}
-            <FullscreenButton
-              className="border-0 bg-transparent text-[#0F172A] shadow-none hover:bg-[#0F172A]/8 hover:text-[#0F172A]"
-              variant="ghost"
-            />
-          </nav>
-        </footer>
+        <ProductFlowFooter
+          activeColor={progressColor}
+          activeStepNumber={stepNumber}
+          businessButtonColor={activeColor}
+          businessButtonDisabled={businessButtonDisabled}
+          businessButtonLabel={businessButtonLabel}
+          previousStep={previousStep}
+          selectedCardId={selectedCardId}
+          selectedScheme={selectedScheme}
+          onBusinessButtonClick={onBusinessButtonClick}
+        />
       </section>
     </ScreenShell>
+  )
+}
+
+function ProductFlowFooter({
+  activeColor,
+  activeStepNumber,
+  businessButtonDisabled = false,
+  businessButtonColor,
+  businessButtonLabel,
+  previousStep,
+  selectedCardId,
+  selectedScheme = 'recommended',
+  onBusinessButtonClick,
+}: {
+  activeColor: string
+  activeStepNumber: number
+  businessButtonDisabled?: boolean
+  businessButtonColor?: string
+  businessButtonLabel: string
+  previousStep?: { step: string }
+  selectedCardId: string
+  selectedScheme?: 'recommended' | 'custom'
+  onBusinessButtonClick: () => void
+}) {
+  const commonGhostActionClassName = 'gap-2 border-0 bg-transparent px-3 text-[#0F172A] shadow-none hover:bg-[#0F172A]/8 hover:text-[#0F172A]'
+  const actionColor = businessButtonColor ?? activeColor
+  const matchedActionButtonClassName = 'h-[63.36px] rounded-[0.857em] px-[34.56px] text-[20.16px] font-semibold shadow-[0_14px_34px_rgba(15,23,42,0.14)]'
+
+  return (
+    <footer className="flex h-[93.36px] shrink-0 items-end justify-between px-10 pb-[30px]">
+      <div className="flex min-w-[320px] items-center gap-2">
+        <Button asChild className={commonGhostActionClassName} size="lg" variant="ghost">
+          <Link to="/ability/carbon-accounting/mechanism">
+            <LogOut />
+            <span>退出体验</span>
+          </Link>
+        </Button>
+        <FullscreenButton
+          className={commonGhostActionClassName}
+          display="text"
+          variant="ghost"
+        />
+      </div>
+
+      <ProductPuzzleProgress
+        activeColor={activeColor}
+        activeStepNumber={activeStepNumber}
+        placement="inline"
+      />
+
+      <nav className="flex min-w-[320px] items-center justify-end">
+        {previousStep ? (
+          <Button
+            asChild
+            className={cn(
+              matchedActionButtonClassName,
+              'border-2 bg-white/45 transition-all duration-200 hover:bg-white/70 hover:brightness-105',
+            )}
+            size="default"
+            style={{ borderColor: actionColor, color: actionColor }}
+            variant="outline"
+          >
+            <Link
+              className="gap-2"
+              state={{ selectedCardId, selectedScheme }}
+              to={`/product-carbon-flow/${previousStep.step}`}
+            >
+              <ArrowLeft className="h-[36px] w-[36px] shrink-0" strokeWidth={2.4} />
+              <span>上一步</span>
+            </Link>
+          </Button>
+        ) : null}
+        <Button
+          className={cn(
+            matchedActionButtonClassName,
+            'ml-5 text-white transition-all duration-200',
+            businessButtonDisabled
+              ? 'cursor-not-allowed bg-[#0F172A]/30 text-white/55 hover:bg-[#0F172A]/30'
+              : 'hover:brightness-105',
+          )}
+          disabled={businessButtonDisabled}
+          size="default"
+          style={{ backgroundColor: businessButtonDisabled ? undefined : actionColor }}
+          type="button"
+          onClick={onBusinessButtonClick}
+        >
+          <span className="flex items-center">
+            <span>{businessButtonLabel}</span>
+            <MousePointerClick className="ml-[7.2px] h-[46.08px] w-[46.08px] shrink-0" strokeWidth={2.4} />
+          </span>
+        </Button>
+      </nav>
+    </footer>
   )
 }
 
@@ -3700,7 +3831,7 @@ function ProductSelectionStepSix({
                       <FileText className="ml-[10px] h-[22px] w-[22px] shrink-0" strokeWidth={2.4} />
                     </button>
                     <button
-                      className="pointer-events-auto flex h-[57px] w-[187px] items-center justify-center rounded-[0.444em] border-2 border-white bg-white text-[18px] font-medium leading-[25px] shadow-[0_18px_44px_rgba(2,8,23,0.14)] transition-transform duration-200 hover:scale-[1.03] hover:bg-white"
+                      className="hidden h-[57px] w-[187px] items-center justify-center rounded-[0.444em] border-2 border-white bg-white text-[18px] font-medium leading-[25px] shadow-[0_18px_44px_rgba(2,8,23,0.14)] transition-transform duration-200 hover:scale-[1.03] hover:bg-white"
                       style={{ color: productResultTheme.rightButtonBackground }}
                       type="button"
                       onClick={onAdvance}
@@ -3825,6 +3956,10 @@ function ProductSelectionStepSix({
 export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
   const location = useLocation()
   const navigate = useNavigate()
+  const [stepOneActiveCard, setStepOneActiveCard] = useState<ProductCard>(stepOneCards[0])
+  const [contentReadyStep, setContentReadyStep] = useState('')
+  const [stepFourBusinessDisabled, setStepFourBusinessDisabled] = useState(false)
+  const [stepFourAdvanceRequestKey, setStepFourAdvanceRequestKey] = useState(0)
   const routeState = location.state as {
     selectedCardId?: string
     selectedScheme?: 'recommended' | 'custom'
@@ -3839,38 +3974,84 @@ export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
     stepOneCards.find((card) => card.id === selectedCardId) ?? stepOneCards[0]
   const selectedScheme = routeState?.selectedScheme ?? 'recommended'
 
+  useEffect(() => {
+    const readyDelays: Record<string, number> = {
+      step1: 480,
+      step2: 5200,
+      step3: 5200,
+      step4: 900,
+      step5: routeState?.revealFromStepFour === true ? 1100 : 250,
+      step6: STEP_SIX_REPORT_REVEAL_DELAY * 1000 + 250,
+      step7: 900,
+    }
+    const timeoutId = window.setTimeout(() => {
+      setContentReadyStep(activeStep.step)
+    }, readyDelays[activeStep.step] ?? 300)
 
-  const flowHeaderActionClassName = "gap-2 border-0 bg-transparent px-3 text-[#0F172A] shadow-none hover:bg-[#0F172A]/8 hover:text-[#0F172A]"
-  const flowHeaderActions = (
-    <>
-      {previousStep ? (
-        <Button asChild className={flowHeaderActionClassName} size="lg" variant="ghost">
-          <Link
-            state={{ selectedCardId: selectedCard.id, selectedScheme }}
-            to={`/product-carbon-flow/${previousStep.step}`}
-          >
-            <ArrowLeft />
-            <span>上一步</span>
-          </Link>
-        </Button>
-      ) : null}
-      <Button asChild className={flowHeaderActionClassName} size="lg" variant="ghost">
-        <Link to="/ability/carbon-accounting/mechanism">
-          <LogOut />
-          <span>退出体验</span>
-        </Link>
-      </Button>
-    </>
-  )
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [activeStep.step, routeState?.revealFromStepFour])
+
+  const businessButtonLabels: Record<string, string> = {
+    step1: '选择当前产品',
+    step2: '启动数据解构',
+    step3: '开启智能建模',
+    step4: '启动核算',
+    step5: '一键生成核算报告',
+    step6: '进入送审环节',
+    step7: '完成体验',
+  }
+  const goToNextStep = (state: Record<string, unknown> = {}) => {
+    if (!nextStep) {
+      return
+    }
+
+    navigate(`/product-carbon-flow/${nextStep.step}`, {
+      state: { selectedCardId: selectedCard.id, selectedScheme, ...state },
+    })
+  }
+  const handleBusinessButtonClick = () => {
+    if (activeStep.step === 'step1') {
+      navigate(`/product-carbon-flow/${nextStep?.step ?? 'step2'}`, {
+        state: { selectedCardId: stepOneActiveCard.id },
+      })
+      return
+    }
+
+    if (activeStep.step === 'step4') {
+      setStepFourAdvanceRequestKey((currentKey) => currentKey + 1)
+      return
+    }
+
+    if (activeStep.step === 'step7') {
+      navigate('/ability/carbon-accounting/mechanism')
+      return
+    }
+
+    goToNextStep()
+  }
+  const isBusinessButtonDisabled =
+    contentReadyStep !== activeStep.step ||
+    (activeStep.step === 'step4' && stepFourBusinessDisabled) ||
+    !businessButtonLabels[activeStep.step]
 
 function ProductSelectionStepSeven({
   selectedCard,
   activeStep,
-  flowHeaderActions,
+  businessButtonDisabled,
+  businessButtonLabel,
+  previousStep,
+  selectedScheme,
+  onBusinessButtonClick,
 }: {
   selectedCard: ProductCard
   activeStep: { step: string; title: string }
-  flowHeaderActions: ReactNode
+  businessButtonDisabled?: boolean
+  businessButtonLabel: string
+  previousStep?: { step: string }
+  selectedScheme?: 'recommended' | 'custom'
+  onBusinessButtonClick: () => void
 }) {
   const certificationAgencies = [
     'TÜV SÜD 南德意志集团',
@@ -3913,11 +4094,16 @@ function ProductSelectionStepSeven({
           showHome={false}
           showFullscreen={false}
         />
-        <div className="absolute bottom-10 right-10 z-50 flex items-center gap-2">
-          {flowHeaderActions}
-          <FullscreenButton
-            className="gap-2 border-0 bg-transparent px-3 text-[#0F172A] shadow-none hover:bg-[#0F172A]/8 hover:text-[#0F172A]"
-            variant="ghost"
+        <div className="absolute bottom-0 left-0 right-0 z-50">
+          <ProductFlowFooter
+            activeColor={getProductReportButtonColor(selectedCard.id)}
+            activeStepNumber={getStepNumber(activeStep.step)}
+            businessButtonDisabled={businessButtonDisabled}
+            businessButtonLabel={businessButtonLabel}
+            previousStep={previousStep}
+            selectedCardId={selectedCard.id}
+            selectedScheme={selectedScheme}
+            onBusinessButtonClick={onBusinessButtonClick}
           />
         </div>
         
@@ -3993,14 +4179,19 @@ function ProductSelectionStepSeven({
     return (
       <PageTransition variant="slide-up">
         <ProductFlowThreeZoneLayout
-          activeColor={getProductReportButtonColor(selectedCard.id)}
+          activeColor={getProductReportButtonColor(stepOneActiveCard.id)}
           activeStepTitle={activeStep.title}
-          headerActions={flowHeaderActions}
+          businessButtonDisabled={isBusinessButtonDisabled}
+          businessButtonLabel={businessButtonLabels[activeStep.step]}
+          previousStep={previousStep}
           selectedCardId={selectedCard.id}
+          selectedScheme={selectedScheme}
           step={activeStep.step}
+          onBusinessButtonClick={handleBusinessButtonClick}
         >
           <section className="relative z-20 flex min-h-0 flex-1 flex-col">
             <ProductSelectorCarousel
+              onActiveCardChange={setStepOneActiveCard}
               onSelect={(card) => {
                 if (nextStep) {
                   navigate(`/product-carbon-flow/${nextStep.step}`, {
@@ -4021,9 +4212,13 @@ function ProductSelectionStepSeven({
         <ProductFlowThreeZoneLayout
           activeColor={getProductReportButtonColor(selectedCard.id)}
           activeStepTitle={activeStep.title}
-          headerActions={flowHeaderActions}
+          businessButtonDisabled={isBusinessButtonDisabled}
+          businessButtonLabel={businessButtonLabels[activeStep.step]}
+          previousStep={previousStep}
           selectedCardId={selectedCard.id}
+          selectedScheme={selectedScheme}
           step={activeStep.step}
+          onBusinessButtonClick={handleBusinessButtonClick}
         >
           <section className="relative z-20 flex min-h-0 flex-1 flex-col">
             <ProductSelectionStepTwo
@@ -4048,9 +4243,13 @@ function ProductSelectionStepSeven({
         <ProductFlowThreeZoneLayout
           activeColor={getProductReportButtonColor(selectedCard.id)}
           activeStepTitle={activeStep.title}
-          headerActions={flowHeaderActions}
+          businessButtonDisabled={isBusinessButtonDisabled}
+          businessButtonLabel={businessButtonLabels[activeStep.step]}
+          previousStep={previousStep}
           selectedCardId={selectedCard.id}
+          selectedScheme={selectedScheme}
           step={activeStep.step}
+          onBusinessButtonClick={handleBusinessButtonClick}
         >
           <section className="relative z-20 flex min-h-0 flex-1 flex-col">
             <ProductSelectionStepThree
@@ -4073,8 +4272,12 @@ function ProductSelectionStepSeven({
     return (
       <ProductSelectionStepSeven
         activeStep={activeStep}
-        flowHeaderActions={flowHeaderActions}
+        businessButtonDisabled={isBusinessButtonDisabled}
+        businessButtonLabel={businessButtonLabels[activeStep.step]}
+        previousStep={previousStep}
         selectedCard={selectedCard}
+        selectedScheme={selectedScheme}
+        onBusinessButtonClick={handleBusinessButtonClick}
       />
     )
   }
@@ -4085,12 +4288,18 @@ function ProductSelectionStepSeven({
         <ProductFlowThreeZoneLayout
           activeColor={getProductReportButtonColor(selectedCard.id)}
           activeStepTitle={activeStep.title}
-          headerActions={flowHeaderActions}
+          businessButtonDisabled={isBusinessButtonDisabled}
+          businessButtonLabel={businessButtonLabels[activeStep.step]}
+          previousStep={previousStep}
           selectedCardId={selectedCard.id}
+          selectedScheme={selectedScheme}
           step={activeStep.step}
+          onBusinessButtonClick={handleBusinessButtonClick}
         >
           <section className="relative z-20 flex min-h-0 flex-1 flex-col">
             <ProductSelectionStepFour
+              advanceRequestKey={stepFourAdvanceRequestKey}
+              onBusinessDisabledChange={setStepFourBusinessDisabled}
               selectedCard={selectedCard}
               onAdvance={(scheme) => {
                 if (nextStep) {
@@ -4141,20 +4350,16 @@ function ProductSelectionStepSeven({
               }}
             />
 
-            <footer className="flex h-20 shrink-0 items-center justify-between px-10">
-              <ProductPuzzleProgress
-                activeColor={activeColor}
-                activeStepNumber={getStepNumber(activeStep.step)}
-                placement="inline"
-              />
-              <nav className="flex items-center gap-2">
-                {flowHeaderActions}
-                <FullscreenButton
-                  className="border-0 bg-transparent text-[#0F172A] shadow-none hover:bg-[#0F172A]/8 hover:text-[#0F172A]"
-                  variant="ghost"
-                />
-              </nav>
-            </footer>
+            <ProductFlowFooter
+              activeColor={activeColor}
+              activeStepNumber={getStepNumber(activeStep.step)}
+              businessButtonDisabled={isBusinessButtonDisabled}
+              businessButtonLabel={businessButtonLabels[activeStep.step]}
+              previousStep={previousStep}
+              selectedCardId={selectedCard.id}
+              selectedScheme={selectedScheme}
+              onBusinessButtonClick={handleBusinessButtonClick}
+            />
           </section>
         </ScreenShell>
       </PageTransition>
@@ -4196,20 +4401,16 @@ function ProductSelectionStepSeven({
               }}
             />
 
-            <footer className="flex h-20 shrink-0 items-center justify-between px-10">
-              <ProductPuzzleProgress
-                activeColor={activeColor}
-                activeStepNumber={getStepNumber(activeStep.step)}
-                placement="inline"
-              />
-              <nav className="flex items-center gap-2">
-                {flowHeaderActions}
-                <FullscreenButton
-                  className="border-0 bg-transparent text-[#0F172A] shadow-none hover:bg-[#0F172A]/8 hover:text-[#0F172A]"
-                  variant="ghost"
-                />
-              </nav>
-            </footer>
+            <ProductFlowFooter
+              activeColor={activeColor}
+              activeStepNumber={getStepNumber(activeStep.step)}
+              businessButtonDisabled={isBusinessButtonDisabled}
+              businessButtonLabel={businessButtonLabels[activeStep.step]}
+              previousStep={previousStep}
+              selectedCardId={selectedCard.id}
+              selectedScheme={selectedScheme}
+              onBusinessButtonClick={handleBusinessButtonClick}
+            />
           </section>
         </ScreenShell>
       </PageTransition>
@@ -4227,11 +4428,16 @@ function ProductSelectionStepSeven({
           showHome={false}
           showFullscreen={false}
         />
-        <div className="absolute bottom-10 right-10 z-50 flex items-center gap-2">
-          {flowHeaderActions}
-          <FullscreenButton
-            className="gap-2 border-0 bg-transparent px-3 text-[#0F172A] shadow-none hover:bg-[#0F172A]/8 hover:text-[#0F172A]"
-            variant="ghost"
+        <div className="absolute bottom-0 left-0 right-0 z-50">
+          <ProductFlowFooter
+            activeColor={getProductReportButtonColor(selectedCard.id)}
+            activeStepNumber={getStepNumber(activeStep.step)}
+            businessButtonDisabled={isBusinessButtonDisabled}
+            businessButtonLabel={businessButtonLabels[activeStep.step] ?? '下一步'}
+            previousStep={previousStep}
+            selectedCardId={selectedCard.id}
+            selectedScheme={selectedScheme}
+            onBusinessButtonClick={handleBusinessButtonClick}
           />
         </div>
         <section className="relative z-20 pt-20">
