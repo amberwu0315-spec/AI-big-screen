@@ -2170,7 +2170,7 @@ function ProductSelectionStepThree({
                 }, 320)
               }}
             >
-              <span>开启智能建模</span>
+              <span>启动智能建模</span>
               <MousePointerClick className="ml-[9px] h-[57.6px] w-[57.6px] shrink-0" strokeWidth={2.4} />
             </motion.button>
           </Button>
@@ -2979,7 +2979,7 @@ function ProductSelectionStepFour({
                   type="button"
                   onClick={handleAdvance}
                 >
-                  <span>启动核算</span>
+                  <span>生成核算结果</span>
                   <MousePointerClick className="ml-[10px] h-5 w-5 shrink-0" strokeWidth={2.4} />
                 </motion.button>
               </Button>
@@ -3612,7 +3612,7 @@ function ProductFlowFooter({
 }) {
   const commonGhostActionClassName = 'gap-2 border-0 bg-transparent px-3 text-[#0F172A] shadow-none hover:bg-[#0F172A]/8 hover:text-[#0F172A]'
   const actionColor = businessButtonColor ?? activeColor
-  const matchedActionButtonClassName = 'h-[63.36px] rounded-[0.857em] px-[34.56px] text-[20.16px] font-semibold shadow-[0_14px_34px_rgba(15,23,42,0.14)]'
+  const matchedActionButtonClassName = 'h-[63.36px] w-[236px] rounded-[0.857em] px-[28px] text-[20.16px] font-semibold shadow-[0_14px_34px_rgba(15,23,42,0.14)]'
 
   return (
     <footer className="flex h-[93.36px] shrink-0 items-end justify-between px-10 pb-[30px]">
@@ -3631,10 +3631,10 @@ function ProductFlowFooter({
             asChild
             className={cn(
               matchedActionButtonClassName,
-              'border-2 bg-white/45 transition-all duration-200 hover:bg-white/70 hover:brightness-105',
+              'border-0 bg-white transition-all duration-200 hover:bg-white hover:brightness-105',
             )}
             size="default"
-            style={{ borderColor: actionColor, color: actionColor }}
+            style={{ color: actionColor }}
             variant="outline"
           >
             <Link
@@ -3642,7 +3642,7 @@ function ProductFlowFooter({
               state={{ selectedCardId, selectedScheme }}
               to={`/product-carbon-flow/${previousStep.step}`}
             >
-              <ArrowLeft className="h-[36px] w-[36px] shrink-0" strokeWidth={2.4} />
+              <ArrowLeft className="!size-[28px] shrink-0" strokeWidth={2.4} />
               <span>上一步</span>
             </Link>
           </Button>
@@ -3664,7 +3664,7 @@ function ProductFlowFooter({
         >
           <span className="flex items-center">
             <span>{businessButtonLabel}</span>
-            <MousePointerClick className="ml-[7.2px] h-[46.08px] w-[46.08px] shrink-0" strokeWidth={2.4} />
+            <MousePointerClick className="ml-[7.2px] !size-[28px] shrink-0" strokeWidth={2.4} />
           </span>
         </Button>
       </nav>
@@ -4054,11 +4054,11 @@ export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
   const businessButtonLabels: Record<string, string> = {
     step1: '选择当前产品',
     step2: '启动数据解构',
-    step3: '开启智能建模',
-    step4: '启动核算',
+    step3: '启动智能建模',
+    step4: '生成核算结果',
     step5: '生成核算报告',
     step6: '进入送审环节',
-    step7: '完成体验',
+    step7: '欢迎再次体验',
   }
   const goToNextStep = (state: Record<string, unknown> = {}) => {
     if (!nextStep) {
@@ -4083,7 +4083,9 @@ export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
     }
 
     if (activeStep.step === 'step7') {
-      navigate('/ability/carbon-accounting/mechanism')
+      navigate('/product-carbon-flow/step1', {
+        state: { selectedCardId: selectedCard.id, selectedScheme },
+      })
       return
     }
 
