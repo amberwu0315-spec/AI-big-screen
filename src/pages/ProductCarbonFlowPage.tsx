@@ -3095,8 +3095,6 @@ function ProductSelectionStepFive({
     lineHeight: `${28.56 * drilldownContentScale}px`,
   }
   const drilldownTitleStyle: CSSProperties = {
-    width: 397.488 * drilldownContentScale,
-    height: 275.184 * drilldownContentScale,
     fontSize: 61.152 * drilldownContentScale,
   }
   const drilldownInset = 40
@@ -3177,15 +3175,22 @@ function ProductSelectionStepFive({
             <motion.div
               key={`drilldown-${selectedDrilldown.id}`}
               animate="animate"
-              className="absolute inset-0 bg-white"
+              className="absolute inset-0 overflow-hidden"
               custom={pageTurnDirection}
               exit="exit"
               initial="initial"
-              style={{ backfaceVisibility: 'hidden', boxShadow: '0 -28px 48px rgba(15,23,42,0.10)', transformStyle: 'preserve-3d' }}
+              style={{
+                backfaceVisibility: 'hidden',
+                backgroundColor: productResultTheme.containerBackground,
+                boxShadow: '0 -28px 48px rgba(15,23,42,0.10)',
+                transformStyle: 'preserve-3d',
+              }}
               transition={stepFivePageTurnTransition}
               variants={stepFivePageTurnVariants}
             >
+              <NoiseTexture className="absolute inset-0 opacity-30" frequency={0.8} noiseOpacity={0.35} octaves={4} slope={0.1} />
               <StepFiveGridBackground color={productResultTheme.rightButtonBackground} />
+              <div className="pointer-events-none absolute inset-0 bg-white/10" />
 
               <div
                 className="absolute left-10 top-10 flex justify-start font-['PingFang_SC'] font-medium text-[#64748B]"
@@ -3207,7 +3212,7 @@ function ProductSelectionStepFive({
                 style={drilldownTitleStyle}
               >
                 <span className="block whitespace-nowrap">{selectedDrilldown.titleLine}</span>
-                <span className="block whitespace-nowrap" style={{ color: productResultTheme.resultText }}>
+                <span className="block whitespace-nowrap text-[120%]" style={{ color: productResultTheme.resultText }}>
                   {selectedDrilldown.highlight}
                 </span>
               </h2>
@@ -3224,7 +3229,7 @@ function ProductSelectionStepFive({
                       <div className="absolute left-[30px] top-1/2 flex h-[70px] w-[70px] -translate-y-1/2 items-center justify-center rounded-[0.625em]" style={{ backgroundColor: productResultTheme.rightCardText }}>
                         <Icon className="h-[38px] w-[38px] text-white" strokeWidth={2.6} />
                       </div>
-                      <p className="absolute left-[120.78px] top-1/2 h-[84px] w-[310px] -translate-y-1/2 whitespace-pre-line font-['PingFang_SC'] text-[30px] font-semibold leading-[42px]" style={{ color: productResultTheme.rightCardText }}>
+                      <p className="absolute left-[120.78px] top-1/2 h-[84px] w-[410px] -translate-y-1/2 whitespace-pre-line font-['PingFang_SC'] text-[30px] font-semibold leading-[42px]" style={{ color: productResultTheme.rightCardText }}>
                         {cardText}
                       </p>
                       <svg
@@ -3240,18 +3245,7 @@ function ProductSelectionStepFive({
                       </svg>
                     </button>
                   ))}
-                  <button
-                    className="relative h-[127px] w-[587px] flex-none rounded-[0.5em] bg-white text-left shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition-transform duration-200 hover:scale-[1.015]"
-                    type="button"
-                    onClick={returnToOverview}
-                  >
-                    <div className="absolute left-[30px] top-1/2 flex h-[70px] w-[70px] -translate-y-1/2 items-center justify-center rounded-[0.625em]" style={{ backgroundColor: productResultTheme.rightCardText }}>
-                      <ArrowLeft className="h-[38px] w-[38px] text-white" strokeWidth={2.6} />
-                    </div>
-                    <p className="absolute left-[120.78px] top-1/2 h-[42px] w-[380px] -translate-y-1/2 whitespace-nowrap font-['PingFang_SC'] text-[30px] font-semibold leading-[42px]" style={{ color: productResultTheme.rightCardText }}>
-                      返回核算结果概览
-                    </p>
-                  </button>
+
                   <button
                     className="hidden h-[127px] w-[587px] flex-none items-center justify-center rounded-[0.5em] font-['PingFang_SC'] text-[40px] font-semibold leading-[56px] text-white shadow-[0_8px_18px_rgba(15,23,42,0.08)] transition-transform duration-200 hover:scale-[1.015]"
                     style={{ backgroundColor: productResultTheme.rightButtonBackground }}
@@ -3401,7 +3395,7 @@ function ProductSelectionStepFive({
                 src={selectedCard.detailImageSrc}
                 style={{ scale: selectedCard.id === 'lithium-battery' ? 0.9 : 1 }}
               />
-              <div className="absolute inset-10 z-10 overflow-hidden">
+              <div className="absolute inset-y-10 inset-x-[80px] z-10 overflow-hidden">
           <div className="absolute left-0 top-0 h-[360px] w-[344px]">
             <div
               className="h-[360px] w-[344px] origin-top-left"
@@ -3409,7 +3403,7 @@ function ProductSelectionStepFive({
             >
               <h2 className="h-[360px] w-[344px] font-['PingFang_SC'] text-[80px] font-semibold leading-[150%] tracking-[0.1em] text-black">
                 <span className="block whitespace-nowrap">{selectedCard.label}</span>
-                <span className="block whitespace-nowrap" style={{ color: productResultTheme.resultText }}>核算结果</span>
+                <span className="block whitespace-nowrap text-[120%]" style={{ color: productResultTheme.resultText }}>核算结果</span>
                 <span className="block whitespace-nowrap">概览</span>
               </h2>
             </div>
@@ -3466,9 +3460,9 @@ function ProductSelectionStepFive({
             </div>
           </div>
 
-          <div className="absolute right-[20px] top-1/2 h-[723px] w-[587px] -translate-y-1/2">
+          <div className="absolute right-0 top-1/2 h-[723px] w-[587px] -translate-y-1/2">
             <div
-              className="flex h-[723px] w-[587px] origin-right flex-col items-center gap-[72px]"
+              className="flex h-[723px] w-[587px] origin-right flex-col items-center justify-center gap-[72px]"
               style={{ transform: `scale(${resultContentScale})` }}
             >
               {rightCards.map(({ Icon, cardText, id }) => (
@@ -3518,7 +3512,7 @@ function ProductSelectionStepFive({
           activeSection={activeSection}
           iconColor={productResultTheme.rightButtonBackground}
           sectionOrder={sectionOrder}
-          showDisabledButtons
+          loop
           showDots={false}
           onSectionSelect={onSectionSelect}
         />

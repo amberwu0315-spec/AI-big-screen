@@ -10,6 +10,7 @@ type AbilityPageTurnControlsProps<T extends string = string> = {
   iconColor?: string
   showDots?: boolean
   showDisabledButtons?: boolean
+  loop?: boolean
 }
 
 export function AbilityPageTurnControls<T extends string = string>({
@@ -20,10 +21,15 @@ export function AbilityPageTurnControls<T extends string = string>({
   iconColor,
   showDots = true,
   showDisabledButtons = false,
+  loop = false,
 }: AbilityPageTurnControlsProps<T>) {
   const activeIndex = Math.max(0, sectionOrder.indexOf(activeSection))
-  const previousSection = sectionOrder[activeIndex - 1]
-  const nextSection = sectionOrder[activeIndex + 1]
+  const previousSection = loop && sectionOrder.length > 1
+    ? (sectionOrder[activeIndex - 1] ?? sectionOrder[sectionOrder.length - 1])
+    : sectionOrder[activeIndex - 1]
+  const nextSection = loop && sectionOrder.length > 1
+    ? (sectionOrder[activeIndex + 1] ?? sectionOrder[0])
+    : sectionOrder[activeIndex + 1]
 
   const buttonClassName = cn(
     'pointer-events-auto fixed top-1/2 z-[90] flex size-20 -translate-y-1/2 items-center justify-center rounded-[20px]',
