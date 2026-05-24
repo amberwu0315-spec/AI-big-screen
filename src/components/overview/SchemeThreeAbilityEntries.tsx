@@ -666,7 +666,7 @@ export function SchemeThreeAbilityEntries({
         </SpinningText>
         {entries.map((entry, index) => {
           const baseIconSize = entry.size === 'large' ? 140 : 100
-          const labelFontSize = entry.size === 'large' ? 22 : 20
+          const labelFontSize = entry.size === 'large' ? 26.4 : 24
           const ability = overviewAbilities[index]
           const iconSize = baseIconSize * abilityIconScale * (ability ? abilityEntryIconScale[ability.id] ?? 1 : 1)
           const iconSrc = ability ? abilityEntryIcons[ability.id] ?? schemeThreeAbilityTempIcon : schemeThreeAbilityTempIcon

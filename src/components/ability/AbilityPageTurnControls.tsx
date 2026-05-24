@@ -8,6 +8,7 @@ type AbilityPageTurnControlsProps<T extends string = string> = {
   onSectionSelect: (section: T) => void
   sectionOrder: readonly T[] | T[]
   iconColor?: string
+  placement?: 'fixed' | 'absolute'
   showDots?: boolean
   showDisabledButtons?: boolean
   loop?: boolean
@@ -19,6 +20,7 @@ export function AbilityPageTurnControls<T extends string = string>({
   onSectionSelect,
   sectionOrder,
   iconColor,
+  placement = 'fixed',
   showDots = true,
   showDisabledButtons = false,
   loop = false,
@@ -32,7 +34,8 @@ export function AbilityPageTurnControls<T extends string = string>({
     : sectionOrder[activeIndex + 1]
 
   const buttonClassName = cn(
-    'pointer-events-auto fixed top-1/2 z-[90] flex size-20 -translate-y-1/2 items-center justify-center rounded-[20px]',
+    'pointer-events-auto top-1/2 z-[90] flex size-20 -translate-y-1/2 items-center justify-center rounded-[20px]',
+    placement === 'fixed' ? 'fixed' : 'absolute',
     'border-0 bg-white/[0.08] backdrop-blur-md',
     iconColor ? 'shadow-[0_18px_48px_rgba(0,0,0,0.14)]' : 'text-white shadow-[0_18px_48px_rgba(0,0,0,0.28)]',
     'transition active:scale-95 disabled:pointer-events-none [&_svg]:size-10',
@@ -62,7 +65,10 @@ export function AbilityPageTurnControls<T extends string = string>({
         <ChevronRight aria-hidden="true" strokeWidth={2.4} />
       </button>
       {showDots ? (
-        <div className="pointer-events-none fixed bottom-[34px] left-1/2 z-[90] flex -translate-x-1/2 items-center gap-3 rounded-full px-4 py-3">
+        <div className={cn(
+          'pointer-events-none bottom-[34px] left-1/2 z-[90] flex -translate-x-1/2 items-center gap-3 rounded-full px-4 py-3',
+          placement === 'fixed' ? 'fixed' : 'absolute',
+        )}>
           {sectionOrder.map((sectionKey, index) => (
             <span
               key={sectionKey}

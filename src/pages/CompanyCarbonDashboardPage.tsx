@@ -918,7 +918,7 @@ export function CompanyCarbonDashboardPage() {
           {!previewMode ? (
             <aside className="flex min-h-0 flex-col overflow-hidden rounded-[18px] border border-white/70 bg-white/70 p-4 shadow-[0_18px_46px_rgba(15,23,42,0.10)] backdrop-blur-xl xl:p-5">
               <div>
-                <h1 className="text-[22px] font-semibold tracking-tight text-slate-950">配置组件</h1>
+                <h1 className="text-[22px] font-semibold tracking-tight text-slate-950">配置组件（页面开发中）</h1>
               </div>
 
               <div className="flex rounded-xl bg-slate-100 p-1 relative z-20 mt-4 xl:mt-5">

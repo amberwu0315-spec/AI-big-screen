@@ -18,7 +18,7 @@ import transformerDetailImage from '@/assets/product-cards/transformer-detail.pn
 import { FullscreenButton } from '@/components/common/FullscreenButton'
 import { NavControl } from '@/components/common/NavControl'
 import { PageTransition } from '@/components/common/PageTransition'
-import { useElementFitScale } from '@/components/common/ScaledStage'
+import { useElementFitScale, useViewportFitScale } from '@/components/common/ScaledStage'
 import { ScreenShell } from '@/components/common/ScreenShell'
 import { AbilityPageTurnControls } from '@/components/ability/AbilityPageTurnControls'
 import { Confetti, type ConfettiRef } from '@/components/magicui/Confetti'
@@ -1471,7 +1471,6 @@ function StepFourTreeNode({
               opacity: 1,
               x: 0,
               scale: [1, 1, 1, 1.03, 1],
-              borderColor: [transparentHighlightColor, transparentHighlightColor, transparentHighlightColor, highlightColor, highlightColor],
             }
           : { opacity: 1, x: 0 }
       }
@@ -1479,10 +1478,11 @@ function StepFourTreeNode({
         'absolute z-20 flex items-center justify-center border-transparent bg-white shadow-[0_18px_36px_rgba(15,23,42,0.08)]',
         onClick ? 'pointer-events-auto cursor-pointer transition-shadow hover:shadow-[0_18px_42px_rgba(15,23,42,0.14)]' : undefined,
       )}
-      initial={{ opacity: 0, x: 14, borderColor: transparentHighlightColor }}
+      initial={{ opacity: 0, x: 14 }}
       onClick={onClick}
       style={{
         borderRadius: STEP_FOUR_TREE_NODE_RADIUS,
+        borderColor: highlighted ? highlightColor : transparentHighlightColor,
         borderWidth: highlighted ? 3 : 0,
         height: STEP_FOUR_TREE_NODE_HEIGHT,
         left,
@@ -1495,7 +1495,6 @@ function StepFourTreeNode({
               opacity: { delay, duration: 0.2, ease: 'easeOut' },
               x: { delay, duration: 0.2, ease: 'easeOut' },
               scale: { delay: delay + 0.76, duration: 0.32, ease: 'easeOut' },
-              borderColor: { delay: delay + 0.76, duration: 0.24, ease: 'linear' },
             }
           : { delay, duration: 0.2, ease: 'easeOut' }
       }
@@ -1506,7 +1505,7 @@ function StepFourTreeNode({
             {level ? <StepFourTreeNodeIcon level={level} /> : null}
             <span className="truncate">{label}</span>
           </span>
-          {highlighted || showDetailArrow ? <ChevronRight className="h-4 w-4 shrink-0 text-[#64748B]" strokeWidth={2.4} /> : null}
+          {showDetailArrow ? <ChevronRight className="h-4 w-4 shrink-0 text-[#64748B]" strokeWidth={2.4} /> : null}
         </span>
       ) : null}
     </motion.div>
@@ -2558,7 +2557,7 @@ function ProductSelectionStepFour({
             const isHighlighted = groupIndex === selectedGroupIndex
             const groupLabels = treeLabels?.[groupIndex]
             const showMaterialTransportBranch = usesMaterialTransportBranch && groupIndex === 0
-            const isTransportNodeInteractive = false
+            const isTransportNodeInteractive = true
             const transportLevelTwoTop = center + STEP_FOUR_TREE_CHILD_OFFSET * 3 - STEP_FOUR_TREE_NODE_HEIGHT / 2
             const transportLevelThreeTop = center + STEP_FOUR_TREE_CHILD_OFFSET * 4 - STEP_FOUR_TREE_NODE_HEIGHT / 2
 
@@ -2603,6 +2602,7 @@ function ProductSelectionStepFour({
                           level={3}
                           highlighted={isTransportNodeInteractive && selectedDetailNode === 'transport'}
                           onClick={isTransportNodeInteractive ? () => {
+                            setSelectedGroupIndex(groupIndex)
                             setSelectedDetailNode('transport')
                             setOpenDropdown(null)
                           } : undefined}
@@ -3223,7 +3223,7 @@ function ProductSelectionStepFive({
               </h2>
 
               <div className="pointer-events-auto absolute bottom-10 right-10 h-[604px] w-[587px] origin-bottom-right" style={{ transform: `scale(${drilldownActionScale})` }}>
-                <div className="flex h-[604px] w-[587px] flex-col gap-8">
+                <div className="flex h-[604px] w-[587px] flex-col justify-end gap-8">
                   {siblingDrilldownCards.map(({ Icon, cardText, id }) => (
                     <button
                       key={id}
@@ -3399,7 +3399,7 @@ function ProductSelectionStepFive({
                 src={selectedCard.detailImageSrc}
                 style={{ scale: selectedCard.id === 'lithium-battery' ? 0.9 : 1 }}
               />
-              <div className="absolute inset-y-10 inset-x-[80px] z-10 overflow-hidden">
+              <div className="absolute inset-y-10 inset-x-[50px] z-10 overflow-hidden">
           <div className="absolute left-0 top-0 h-[360px] w-[344px]">
             <div
               className="h-[360px] w-[344px] origin-top-left"
@@ -3413,13 +3413,13 @@ function ProductSelectionStepFive({
             </div>
           </div>
 
-          <div className="absolute bottom-[30px] left-0 h-[473px] min-w-[873px] w-max">
+          <div className="absolute bottom-[30px] left-0 h-[473px] w-[760px]">
             <div
-              className="flex h-[473px] min-w-[873px] w-max origin-bottom-left flex-col items-start gap-5"
+              className="flex h-[473px] w-[760px] origin-bottom-left flex-col items-start gap-5"
               style={{ transform: `scale(${resultContentScale})` }}
             >
                 <section
-                  className="flex h-[219px] min-w-[579px] w-max flex-none flex-col items-start justify-end gap-5 rounded-[20px] px-[50px] py-[30px] shadow-[0_6px_18px_rgba(15,23,42,0.12)]"
+                  className="flex h-[219px] w-[660px] flex-none flex-col items-start justify-end gap-5 rounded-[20px] px-[50px] py-[30px] shadow-[0_6px_18px_rgba(15,23,42,0.12)]"
                   style={{ backgroundColor: productResultTheme.resultCardBackground }}
                 >
                   <div className="flex h-[97px] w-full items-end gap-[20px]">
@@ -3435,8 +3435,8 @@ function ProductSelectionStepFive({
                   </p>
                 </section>
 
-                <section className="flex h-[234px] min-w-[873px] w-max flex-none flex-col items-start justify-end gap-5 rounded-[20px] bg-white px-[50px] py-[30px] shadow-[0_6px_18px_rgba(15,23,42,0.12)]">
-                  <div className="flex h-[112px] w-full items-center gap-[50px]">
+                <section className="flex h-[234px] w-[760px] flex-none flex-col items-start justify-end gap-5 rounded-[20px] bg-white px-[50px] py-[30px] shadow-[0_6px_18px_rgba(15,23,42,0.12)]">
+                  <div className="flex h-[112px] w-full items-center justify-between">
                     <div className="flex h-[112px] items-end gap-[20px]">
                       <span className="h-[112px] whitespace-nowrap font-['PingFang_SC'] text-[80px] font-semibold leading-[112px]" style={{ color: productResultTheme.intervalText }}>
                         {selectedCard.id === 'backpack' ? '-14.34' : selectedCard.id === 'lithium-battery' ? '-8.01' : selectedCard.id === 'transformer' ? '-16.87' : '-15.47'}
@@ -3512,15 +3512,15 @@ function ProductSelectionStepFive({
           )}
           </AnimatePresence>
         </motion.div>
-        <AbilityPageTurnControls
-          activeSection={activeSection}
-          iconColor={productResultTheme.rightButtonBackground}
-          sectionOrder={sectionOrder}
-          loop
-          showDots={false}
-          onSectionSelect={onSectionSelect}
-        />
       </motion.div>
+      <AbilityPageTurnControls
+        activeSection={activeSection}
+        iconColor={productResultTheme.rightButtonBackground}
+        sectionOrder={sectionOrder}
+        loop
+        showDots={false}
+        onSectionSelect={onSectionSelect}
+      />
     </div>
   )
 }
@@ -3588,7 +3588,7 @@ function ProductFlowThreeZoneLayout({
             />
           </Link>
 
-          <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
+          <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-100">
             {footerTitle ?? activeStepTitle}
           </h1>
         </header>
@@ -3637,75 +3637,93 @@ function ProductFlowFooter({
   const commonGhostActionClassName = 'gap-2 border-0 bg-transparent px-3 text-[#0F172A] shadow-none hover:bg-[#0F172A]/8 hover:text-[#0F172A]'
   const actionColor = businessButtonColor ?? activeColor
   const matchedActionButtonClassName = 'h-[63.36px] w-[236px] rounded-[0.857em] px-[28px] text-[20.16px] font-semibold shadow-[0_14px_34px_rgba(15,23,42,0.14)]'
+  const { scale: footerScale } = useViewportFitScale()
+  const footerDesignHeight = 93.36
 
   return (
-    <footer className="flex h-[93.36px] shrink-0 items-end justify-between px-10 pb-[30px]">
-      <div className="flex min-w-[320px] items-center justify-start">
-        <ProductPuzzleProgress
-          activeColor={activeColor}
-          activeStepNumber={activeStepNumber}
-          animateOnComplete={false}
-          placement="inline"
-        />
-      </div>
+    <footer className="relative shrink-0 overflow-visible" style={{ height: footerDesignHeight * footerScale }}>
+      <div
+        className="absolute bottom-0 left-0 flex items-end justify-between px-10 pb-[30px]"
+        style={{
+          height: footerDesignHeight,
+          transform: `scale(${footerScale})`,
+          transformOrigin: 'left bottom',
+          width: `${100 / footerScale}%`,
+        }}
+      >
+        <div className="flex min-w-[320px] items-center justify-start">
+          <ProductPuzzleProgress
+            activeColor={activeColor}
+            activeStepNumber={activeStepNumber}
+            animateOnComplete={false}
+            placement="inline"
+          />
+        </div>
 
-      <nav className="flex flex-1 origin-bottom scale-90 items-center justify-center">
-        {previousStep ? (
+        <nav className="flex flex-1 origin-bottom scale-90 items-center justify-center">
+          {previousStep ? (
+            <Button
+              asChild
+              className={cn(
+                matchedActionButtonClassName,
+                'border-0 bg-white transition-all duration-200 hover:bg-white hover:brightness-105',
+              )}
+              size="default"
+              style={{ color: actionColor }}
+              variant="outline"
+            >
+              <Link
+                className="gap-2"
+                state={{ selectedCardId, selectedScheme }}
+                to={`/product-carbon-flow/${previousStep.step}`}
+              >
+                <ArrowLeft className="!size-[22px] shrink-0" strokeWidth={2.4} />
+                <span>上一步</span>
+              </Link>
+            </Button>
+          ) : null}
           <Button
-            asChild
             className={cn(
               matchedActionButtonClassName,
-              'border-0 bg-white transition-all duration-200 hover:bg-white hover:brightness-105',
+              previousStep ? 'ml-5' : '',
+              'text-white transition-all duration-200',
+              businessButtonDisabled
+                ? 'cursor-not-allowed bg-[#0F172A]/30 text-white/55 hover:bg-[#0F172A]/30'
+                : 'hover:brightness-105',
             )}
+            disabled={businessButtonDisabled}
             size="default"
-            style={{ color: actionColor }}
-            variant="outline"
+            style={{ backgroundColor: businessButtonDisabled ? undefined : actionColor }}
+            type="button"
+            onClick={() => {
+              if (businessButtonDisabled) {
+                return
+              }
+
+              onBusinessButtonClick()
+            }}
           >
-            <Link
-              className="gap-2"
-              state={{ selectedCardId, selectedScheme }}
-              to={`/product-carbon-flow/${previousStep.step}`}
-            >
-              <ArrowLeft className="!size-[28px] shrink-0" strokeWidth={2.4} />
-              <span>上一步</span>
+            <span className="flex items-center">
+              <span>{businessButtonLabel}</span>
+              <MousePointerClick className="ml-[7.2px] !size-[22px] shrink-0" strokeWidth={2.4} />
+            </span>
+          </Button>
+        </nav>
+
+        <div className="flex min-w-[320px] items-center justify-end gap-2">
+          <Button asChild className={commonGhostActionClassName} size="lg" variant="ghost">
+            <Link to="/ability/carbon-accounting/mechanism">
+              <LogOut />
+              <span>退出体验</span>
             </Link>
           </Button>
-        ) : null}
-        <Button
-          className={cn(
-            matchedActionButtonClassName,
-            previousStep ? 'ml-5' : '',
-            'text-white transition-all duration-200',
-            businessButtonDisabled
-              ? 'cursor-not-allowed bg-[#0F172A]/30 text-white/55 hover:bg-[#0F172A]/30'
-              : 'hover:brightness-105',
-          )}
-          disabled={businessButtonDisabled}
-          size="default"
-          style={{ backgroundColor: businessButtonDisabled ? undefined : actionColor }}
-          type="button"
-          onClick={onBusinessButtonClick}
-        >
-          <span className="flex items-center">
-            <span>{businessButtonLabel}</span>
-            <MousePointerClick className="ml-[7.2px] !size-[28px] shrink-0" strokeWidth={2.4} />
-          </span>
-        </Button>
-      </nav>
-
-      <div className="flex min-w-[320px] items-center justify-end gap-2">
-        <Button asChild className={commonGhostActionClassName} size="lg" variant="ghost">
-          <Link to="/ability/carbon-accounting/mechanism">
-            <LogOut />
-            <span>退出体验</span>
-          </Link>
-        </Button>
-        <FullscreenButton
-          className={commonGhostActionClassName}
-          display="text"
-          textLabel="退出全屏（临时）"
-          variant="ghost"
-        />
+          <FullscreenButton
+            className={commonGhostActionClassName}
+            display="text"
+            textLabel="退出全屏（临时）"
+            variant="ghost"
+          />
+        </div>
       </div>
     </footer>
   )
@@ -3943,15 +3961,15 @@ function ProductSelectionStepSix({
             </motion.div>
           )}
         </AnimatePresence>
-        <AbilityPageTurnControls
-          activeSection={activeReportPage}
-          iconColor={productResultTheme.rightButtonBackground}
-          sectionOrder={stepSixReportPageOrder}
-          showDisabledButtons
-          showDots={false}
-          onSectionSelect={onReportPageSelect}
-        />
       </motion.div>
+      <AbilityPageTurnControls
+        activeSection={activeReportPage}
+        iconColor={productResultTheme.rightButtonBackground}
+        sectionOrder={stepSixReportPageOrder}
+        showDisabledButtons
+        showDots={false}
+        onSectionSelect={onReportPageSelect}
+      />
 
       {showTransitionOverlay ? (
         <motion.div
@@ -4097,6 +4115,10 @@ export function ProductCarbonFlowPage({ step }: ProductCarbonFlowPageProps) {
     })
   }
   const handleBusinessButtonClick = () => {
+    if (isBusinessButtonDisabled) {
+      return
+    }
+
     if (activeStep.step === 'step1') {
       navigate(`/product-carbon-flow/${nextStep?.step ?? 'step2'}`, {
         state: { selectedCardId: stepOneActiveCard.id },
@@ -4172,7 +4194,7 @@ function ProductSelectionStepSeven({
 
         <NavControl
           actions={
-            <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
+            <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-100">
               {activeStep.title}
             </h1>
           }
@@ -4419,7 +4441,7 @@ function ProductSelectionStepSeven({
                 />
               </Link>
 
-              <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
+              <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-100">
                 {`${activeStep.title}（${selectedScheme === 'custom' ? '自选方案' : '推荐方案'}）`}
               </h1>
             </header>
@@ -4470,7 +4492,7 @@ function ProductSelectionStepSeven({
                 />
               </Link>
 
-              <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">
+              <h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-100">
                 {`${activeStep.title}（${selectedScheme === 'custom' ? '自选方案' : '推荐方案'}）`}
               </h1>
             </header>
@@ -4509,7 +4531,7 @@ function ProductSelectionStepSeven({
         <ProductSurfaceBackground backgroundColor={getProductFlowNeutralBackground()} selectedCardId={selectedCard.id} step={activeStep.step} />
         <ProductStepPuzzle selectedCardId={selectedCard.id} step={activeStep.step} />
         <NavControl
-          actions={<h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-30">{activeStep.title}</h1>}
+          actions={<h1 className="text-right text-[26.88px] font-semibold leading-[1.05] text-[#0F172A] opacity-100">{activeStep.title}</h1>}
           showBack={false}
           showHome={false}
           showFullscreen={false}
